@@ -1,0 +1,2 @@
+domain: dev-wmrnzcxjnqofznny.us.auth0.com
+client name: XOnUj58cwGJgLfFmuJt220EpO1TVtMZf
