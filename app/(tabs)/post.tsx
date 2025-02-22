@@ -16,7 +16,7 @@ export default function ProfileScreen() {
                 />
             }>
             <ThemedView style={styles.titleContainer}>
-                <ThemedText type="title">Profile</ThemedText>
+                <ThemedText type="title">Post</ThemedText>
                 <HelloWave />
             </ThemedView>
         </ParallaxScrollView>
