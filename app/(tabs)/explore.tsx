@@ -1,7 +1,6 @@
-// app/explore.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { useRouter } from 'expo-router';
 
 // Sample data for search
 const data = [
@@ -11,11 +10,11 @@ const data = [
   { id: '4', name: 'Overhead Press' },
   { id: '5', name: 'Bicep Curl' },
 ];
+
 const ExploreScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState(data);
-
-  
+  const router = useRouter();
 
   // Handle search logic
   const handleSearch = (text: string) => {
@@ -27,27 +26,39 @@ const ExploreScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Search for Lads</Text>  {/* Updated Title Here */}
+    <View style={styles.safeArea}>
+      {/* Header with Title and Profile Pic */}
+      <View style={styles.headerBar}>
+        <Text style={styles.headerText}>Search for Lads</Text>
+        <TouchableOpacity onPress={() => router.push('/profile')}>
+          <Image
+            source={{ uri: 'https://via.placeholder.com/40' }}
+            style={styles.profilePic}
+          />
+        </TouchableOpacity>
+      </View>
 
       {/* Search Bar */}
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search..."
-        value={searchQuery}
-        onChangeText={handleSearch}
-      />
+      <View style={styles.container}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search..."
+          value={searchQuery}
+          onChangeText={handleSearch}
+        />
 
-      {/* Search Results */}
-      <FlatList
-        data={filteredData}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.item}>
-            <Text style={styles.itemText}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-      />
+        {/* Search Results */}
+        <FlatList
+          data={filteredData}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.item}>
+              <Text style={styles.itemText}>{item.name}</Text>
+            </TouchableOpacity>
+          )}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
     </View>
   );
 };
@@ -55,18 +66,32 @@ const ExploreScreen = () => {
 export default ExploreScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#f8f8f8',
   },
-  header: {
+  headerBar: {
+    marginTop: 40, // Space below status bar
+    marginBottom: 10,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerText: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    padding: 30,
-
+  },
+  profilePic: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#ccc',
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    backgroundColor: '#f8f8f8',
   },
   searchInput: {
     height: 50,
@@ -90,3 +115,4 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+
