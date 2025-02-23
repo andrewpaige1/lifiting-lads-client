@@ -26,10 +26,6 @@ const PostScreen = () => {
       {/* Header Section */}
       <View style={styles.headerBar}>
         <Text style={styles.headerText}>Create a New Post</Text>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/40' }}
-          style={styles.profilePic}
-        />
       </View>
 
       {/* Decorative Line Under Header */}
