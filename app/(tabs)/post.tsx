@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
+import { router } from 'expo-router';
 // Define route parameters
 type RootStackParamList = {
   PRPostScreen: undefined;
@@ -28,7 +28,7 @@ const PostScreen = () => {
       </TouchableOpacity>
 
       {/* Post Your Lift */}
-      <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('CameraScreen')}>
+      <TouchableOpacity style={styles.box} onPress={() => router.push('/CameraScreen')}>
         <Text style={styles.boxText}>Post Your Lift</Text>
       </TouchableOpacity>
     </View>

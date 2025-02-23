@@ -1,96 +1,108 @@
-// app/CameraScreen.tsx
-/*import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Camera, CameraType } from 'expo-camera/next';
-import { useNavigation } from '@react-navigation/native';
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { useState, useRef } from 'react';
+import { Button, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
 
-const CameraScreen = () => {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [type, setType] = useState<'front' | 'back'>('back');
-  const cameraRef = useRef<React.ElementRef<typeof Camera>>(null);
-  const navigation = useNavigation();
+export default function App() {
+  const [facing, setFacing] = useState<CameraType>('back');
+  const [permission, requestPermission] = useCameraPermissions();
+  const cameraRef = useRef<any>(null);
+  const [photo, setPhoto] = useState(null); // Store captured image
 
-  // Request Camera Permission
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
-
-  // Take Picture
-  const takePicture = async () => {
-    if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
-      console.log('Photo taken:', photo.uri);
-      alert('Photo taken successfully!');
-    }
-  };
-
-  if (hasPermission === null) {
-    return <Text>Requesting camera permission...</Text>;
+  if (!permission) {
+    return <View />;
   }
 
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+  if (!permission.granted) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>We need your permission to show the camera</Text>
+        <Button onPress={requestPermission} title="Grant Permission" />
+      </View>
+    );
+  }
+
+  function toggleCameraFacing() {
+    setFacing(current => (current === 'back' ? 'front' : 'back'));
+  }
+
+  async function takePicture() {
+    if (cameraRef.current) {
+      const photo = await cameraRef.current.takePictureAsync(); // Capture image
+      setPhoto(photo.uri); // Save the image URI
+      router.push({
+        pathname: '/ViewPicture',
+        params: { imageUri: photo.uri }, // Pass image URI to ViewPicture component
+      });
+    }
   }
 
   return (
     <View style={styles.container}>
-      <Camera ref={cameraRef} style={styles.camera} type={type}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.flipButton}
-            onPress={() => setType(type === 'back' ? 'front' : 'back')}
-          >
-            <Text style={styles.text}>Flip Camera</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
-            <Text style={styles.text}>Take Picture</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.text}>Go Back</Text>
-          </TouchableOpacity>
+      {photo ? (
+        <View style={styles.previewContainer}>
+          <Image source={{ uri: photo }} style={styles.preview} />
+          <Button title="Retake" onPress={() => setPhoto(null)} />
         </View>
-      </Camera>
+      ) : (
+        <CameraView ref={cameraRef} style={styles.camera} facing={facing} />
+      )}
+
+      {/* Camera Controls positioned above the bottom tabs */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+          <Text style={styles.text}>Flip</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
+          <Text style={styles.text}>📸</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
-};
-
-export default CameraScreen;
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  message: {
+    textAlign: 'center',
+    paddingBottom: 10,
+  },
   camera: {
     flex: 1,
   },
-  buttonContainer: {
+  previewContainer: {
     flex: 1,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'flex-end',
-    paddingBottom: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  flipButton: {
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 5,
+  preview: {
+    width: '100%',
+    height: '100%',
+  },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 100, // Position above bottom tabs
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  button: {
+    padding: 15,
+    backgroundColor: '#fff',
+    borderRadius: 30,
   },
   captureButton: {
-    backgroundColor: '#28a745',
-    padding: 10,
-    borderRadius: 5,
-  },
-  backButton: {
-    backgroundColor: '#dc3545',
-    padding: 10,
-    borderRadius: 5,
+    padding: 20,
+    borderRadius: 50,
   },
   text: {
-    color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
   },
-});*/
+});
+
