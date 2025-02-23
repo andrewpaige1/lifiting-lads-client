@@ -1,4 +1,3 @@
-// hooks/useAuth.ts
 import { useState, useEffect, useCallback, useContext } from 'react';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
@@ -7,6 +6,8 @@ import { UserContext } from '../Store';
 // NOTE: If you'd like, you can keep domain and client IDs in .env for security
 const auth0Domain = 'dev-k677hwj8xdv51cs0.us.auth0.com';
 const clientId = '3sSPuIJrqlcprrRc5i90gKM2Hj3Lz8Tg';
+
+const API_BASE_URL = 'http://172.23.36.208:3000'; // Replace with your actual API URL
 
 // Auth0's "discovery" endpoints
 const discovery = {
@@ -18,16 +19,18 @@ const discovery = {
 const scopes = ['openid', 'profile', 'email'];
 
 export function useAuth() {
-  //const [userInfo, setUserInfo] = useState<any>(null);
   const userContext = useContext(UserContext);
   if (!userContext) {
     throw new Error("useAuth must be used within a UserProvider");
   }
   const { userInfo, setUserInfo } = userContext;
+
   const redirectUri = AuthSession.makeRedirectUri({
     scheme: 'liftinglads', // Must match the "scheme" in your app.json or app.config.js
   });
-  console.log(redirectUri)
+
+  console.log(redirectUri);
+
   // Set up the authentication request
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
@@ -54,9 +57,34 @@ export function useAuth() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await userInfoResponse.json();
+
+      // Save user to MongoDB
+      await saveUserToDB(data);
+
       setUserInfo(data);
     } catch (error) {
       console.error('Failed to fetch user info:', error);
+    }
+  }, []);
+
+  // Save the user object to the backend
+  const saveUserToDB = useCallback(async (user: any) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/save-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userInfo: user }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to save user to database:', await response.json());
+      } else {
+        console.log('User saved to database successfully');
+      }
+    } catch (error) {
+      console.error('Error saving user to database:', error);
     }
   }, []);
 
@@ -67,13 +95,11 @@ export function useAuth() {
 
   // Log out the user (clears Auth0 session and local state)
   const handleLogout = useCallback(async () => {
-    // 1. Clear local user state
     setUserInfo(null);
 
-    // 2. Universal logout from Auth0’s session
     const returnTo = AuthSession.makeRedirectUri({
       scheme: 'liftinglads',
-      path: 'loggedOut', // or some path you want to handle after logout
+      path: 'loggedOut',
     });
 
     const logoutUrl =
@@ -81,15 +107,13 @@ export function useAuth() {
       `client_id=${clientId}&` +
       `returnTo=${encodeURIComponent(returnTo)}`;
 
-    // 3. Open the browser to log out from Auth0
     WebBrowser.openBrowserAsync(logoutUrl);
-    // Close the WebBrowser again (on iOS, might need slightly different flow)
     WebBrowser.dismissBrowser();
   }, []);
 
   return {
     userInfo,
-    request, // Expose if you need to conditionally disable login button
+    request,
     handleLogin,
     handleLogout,
   };
