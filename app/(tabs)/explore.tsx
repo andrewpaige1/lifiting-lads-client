@@ -73,7 +73,15 @@ const ExploreScreen = () => {
           data={filteredUsers}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.item}>
+            <TouchableOpacity style={styles.item} onPress={() => (
+
+            router.push({
+            pathname: '/user-profile',
+            params: { userId: item._id }, // Pass image URI to ViewPicture component
+          })
+
+
+            )}>
               <Text style={styles.itemText}>{item.nickname}</Text>
               <Text style={styles.emailText}>{item.email}</Text>
             </TouchableOpacity>
