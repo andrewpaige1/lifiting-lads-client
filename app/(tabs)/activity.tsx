@@ -56,7 +56,8 @@ const ActivityFeed = () => {
 
       setActivities(requests);
     } catch (error) {
-      console.error('Error fetching lifting lad requests:', error);
+      //console.error('Error fetching lifting lad requests:', error);
+      return error
     } finally {
       setRefreshing(false); // Stop refresh indicator
     }

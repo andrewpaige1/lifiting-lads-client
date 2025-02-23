@@ -34,14 +34,14 @@ export default function Home() {
 
     try {
       const response = await fetch(`https://lifting-lads-api.onrender.com/friends-posts/${userInfo.nickname}`);
-      if (!response.ok) throw new Error("Failed to fetch posts");
+      if (!response.ok) return;
 
       const data = await response.json();
       if (data.posts) {
         setPosts(data.posts);
       }
     } catch (error) {
-      console.error("Error fetching friends' posts:", error);
+      return error
     } finally {
       setLoading(false);
       setRefreshing(false); // Stop refreshing when done
