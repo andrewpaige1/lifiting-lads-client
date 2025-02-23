@@ -1,14 +1,11 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
-
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-// import TopRightIcons from './TopRightIcons';
-
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -22,12 +19,12 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
+            position: 'absolute', // For iOS blur effect
           },
           default: {},
         }),
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
@@ -35,21 +32,24 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
+      
+      {/* Updated Explore Tab */}
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Search',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="map.fill" color={color} />,
+          title: 'Search', // Updated title
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />, // More relevant icon
         }}
       />
+
       <Tabs.Screen
-        name="post"
+        name="../post"
         options={{
           title: 'Post',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.circle.fill" color={color} />,
         }}
       />
-      
+
       <Tabs.Screen
         name="activity"
         options={{
@@ -57,20 +57,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="bell.fill" color={color} />,
         }}
       />
+
       <Tabs.Screen
         name="leaf"
         options={{
           title: 'Leaf',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="bell.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="leaf.fill" color={color} />,
         }}
       />
-      {/* <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.crop.circle.fill" color={color} />,
-        }}
-      /> */}
     </Tabs>
   );
 }
