@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect, useContext } from 'react';
 import {
   SafeAreaView,
   View,
@@ -13,11 +13,14 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '@/hooks/useAuth';
+import { UserContext } from '@/Store';
 
 const Profile = () => {
   const [tagSearch, setTagSearch] = useState('#');
   const navigation = useNavigation();
   const { handleLogout } = useAuth()
+  const userContext = useContext(UserContext);
+  const { userInfo } = userContext;
 
   // Set header with back arrow
   useLayoutEffect(() => {
@@ -102,7 +105,7 @@ const Profile = () => {
           <View style={styles.profilePicture} />
         </View>
 
-        <Text style={styles.username}>lifting_lad_123</Text>
+        <Text style={styles.username}>{userInfo.nickname}</Text>
         <Text style={styles.bio}>
           Passionate about lifting and hitting new PRs. Let’s get stronger together!
         </Text>
