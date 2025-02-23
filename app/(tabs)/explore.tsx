@@ -19,7 +19,7 @@ const ExploreScreen = () => {
   // Handle search logic
   const handleSearch = (text: string) => {
     setSearchQuery(text);
-    const filtered = data.filter(item =>
+    const filtered = data.filter((item) =>
       item.name.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredData(filtered);
@@ -42,7 +42,10 @@ const ExploreScreen = () => {
       <View style={styles.container}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search..."
+          placeholder="Find your friends..."
+          //italicize ???
+          
+          placeholderTextColor="#90a4ae"
           value={searchQuery}
           onChangeText={handleSearch}
         />
@@ -68,51 +71,100 @@ export default ExploreScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#f0f2f5', // Modern light background
   },
+
+  // Header Bar
   headerBar: {
-    marginTop: 40, // Space below status bar
+    marginTop: 45, // Reduced space for tighter layout
+    right: 10,
     marginBottom: 10,
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingBottom: 8,
   },
   headerText: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 25,
+    fontWeight: '700',
+    fontFamily: 'Poppins-Bold',
+    color: '#37474f', // Modern gray for titles
+    padding: 14,
+
   },
   profilePic: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#ccc',
+    backgroundColor: '#b0bec5',
   },
+
+  // Main Container
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#f0f2f5',
   },
+
+  // Search Input
   searchInput: {
     height: 50,
-    borderColor: '#007bff',
+    borderColor: '#1e88e5', // Deep blue accent
     borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 10,
+    borderRadius: 12,
+    paddingHorizontal: 14,
     marginBottom: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
+    fontSize: 16,
+    fontFamily: 'Poppins-Italic',
   },
+
+  // Search Item Card
   item: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    backgroundColor: '#fff',
-    borderRadius: 10,
+    padding: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
     marginBottom: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
   },
   itemText: {
     fontSize: 18,
-    color: '#333',
+    fontFamily: 'Poppins-Medium',
+    color: '#37474f',
+  },
+
+  // Button (if you add interactions)
+  button: {
+    backgroundColor: '#1e88e5', // Deep blue for contrast
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '600',
+    fontFamily: 'Poppins-SemiBold',
+  },
+
+  // Fact Box for Highlights
+  factBox: {
+    padding: 16,
+    backgroundColor: '#e8f5e9', // Soft green for sustainability
+    borderRadius: 12,
+    marginVertical: 10,
+  },
+  factText: {
+    fontSize: 16,
+    color: '#2e7d32',
+    fontFamily: 'Poppins-Medium',
   },
 });
-

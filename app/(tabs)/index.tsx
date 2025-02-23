@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { View, Text, Image, ScrollView, Pressable, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 
+
 export default function Home() {
   const router = useRouter();
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -72,42 +73,58 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#f0f2f5', // Light modern background
   },
+
+  // Header styling
   headerWrapper: {
     position: 'absolute',
-    top: 40, 
-    left: 16,
+    top: 40, // Reduced space from top
+    left: 6,
     right: 16,
     zIndex: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom: 10,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 25,
+    fontWeight: '700',
+    fontFamily: 'Poppins-Bold', 
+    color: '#37474f',
+    padding: 15,
   },
   profilePic: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#ccc',
+    backgroundColor: '#b0bec5',
   },
+
+  // Scroll area
   scrollContainer: {
     flex: 1,
     paddingHorizontal: 16,
+    paddingTop: 80, // Reduced padding for tighter layout
   },
+
+  // Post container with card effect
   postContainer: {
-    backgroundColor: '#f3f3f3',
-    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
     padding: 16,
     marginBottom: 16,
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
   },
+
+  // Post header (username, date)
   postHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -121,21 +138,88 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    marginRight: 8,
+    marginRight: 10,
   },
   username: {
     fontWeight: '600',
+    fontSize: 17,
+    fontFamily: 'Poppins-Medium',
+    color: '#37474f',
   },
   date: {
-    color: '#888',
+    fontSize: 14,
+    fontFamily: 'Poppins-Light',
+    color: '#90a4ae',
   },
+
+  // Post content area
   postContent: {
-    height: 330,
-    backgroundColor: '#ccc',
-    borderRadius: 8,
+    height: 300,
+    backgroundColor: '#cfd8dc',
+    borderRadius: 12,
     marginBottom: 8,
+    overflow: 'hidden',
   },
+
+  // Post description
   description: {
-    color: '#666',
+    fontSize: 15,
+    color: '#455a64',
+    lineHeight: 22,
+    fontFamily: 'Poppins-Regular',
+  },
+
+  // Buttons and interactions
+  button: {
+    backgroundColor: '#1e88e5', // New deep blue accent for contrast
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '600',
+    fontFamily: 'Poppins-SemiBold',
+  },
+
+  // Fact Box
+  factBox: {
+    padding: 16,
+    backgroundColor: '#e8f5e9', // Soft green for sustainability
+    borderRadius: 12,
+    marginVertical: 10,
+  },
+  factText: {
+    fontSize: 16,
+    color: '#2e7d32',
+    fontFamily: 'Poppins-Medium',
+  },
+
+  // Card-like input field
+  input: {
+    height: 50,
+    borderColor: '#1e88e5', // Deep blue accent for focus
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    backgroundColor: '#ffffff',
+    marginBottom: 15,
+    fontSize: 16,
+    fontFamily: 'Poppins-Regular',
+  },
+
+  // Card-like results
+  resultBox: {
+    padding: 16,
+    backgroundColor: '#eceff1',
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  resultText: {
+    fontSize: 16,
+    color: '#37474f',
+    fontFamily: 'Poppins-Medium',
   },
 });

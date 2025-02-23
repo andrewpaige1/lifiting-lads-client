@@ -1,6 +1,6 @@
 // app/post.tsx
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { router } from 'expo-router';
@@ -19,18 +19,30 @@ const PostScreen = () => {
   const navigation = useNavigation<NavigationProp>();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Create a New Post</Text>
+    <View style={styles.safeArea}>
+      {/* Header Section */}
+      <View style={styles.headerBar}>
+        <Text style={styles.headerText}>Create a New Post</Text>
+        <Image
+          source={{ uri: 'https://via.placeholder.com/40' }}
+          style={styles.profilePic}
+        />
+      </View>
 
-      {/* Post a PR */}
-      <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('PRPostScreen')}>
-        <Text style={styles.boxText}>Post a PR</Text>
-      </TouchableOpacity>
+      {/* Decorative Line Under Header */}
+      <View style={styles.headerLine} />
+
+      <View style={styles.container}>
+        {/* Post a PR */}
+        <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('PRPostScreen')}>
+          <Text style={styles.boxText}>🏋️ Post a PR</Text>
+        </TouchableOpacity>
 
       {/* Post Your Lift */}
-      <TouchableOpacity style={styles.box} onPress={() => router.push('/CameraScreen')}>
+      <TouchableOpacity style={styles.box} onPress={() => router.push('/LiftCam')}>
         <Text style={styles.boxText}>Post Your Lift</Text>
       </TouchableOpacity>
+    </View>
     </View>
   );
 };
@@ -38,35 +50,74 @@ const PostScreen = () => {
 export default PostScreen;
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f0f2f5',
+  },
+
+  // Header Bar
+  headerBar: {
+    marginTop: 45, // Reduced space for tighter layout
+    right: 10,
+    marginBottom: 10,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingBottom: 8,
+  },
+  headerText: {
+    fontSize: 25,
+    fontWeight: '700',
+    fontFamily: 'Poppins-Bold',
+    color: '#37474f', // Modern gray for titles
+    padding: 14,
+
+  },
+  profilePic: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#b0bec5',
+  },
+
+  // Decorative Line Under Header
+  headerLine: {
+    height: 4,
+    backgroundColor: '#ddd', // Light gray to match other screens
+    borderRadius: 2,
+    marginHorizontal: 20,
+    marginBottom: 10,
+  },
+
+  // Main Content Area
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8',
     paddingHorizontal: 20,
+    backgroundColor: '#f0f2f5',
   },
-  header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 30,
-    textAlign: 'center',
-  },
+
+  // Post Action Box
   box: {
     width: '100%',
-    padding: 20,
-    marginVertical: 10,
-    backgroundColor: '#007bff',
-    borderRadius: 10,
+    padding: 18,
+    marginVertical: 12,
+    backgroundColor: '#ffffff', // White card-style
+    borderRadius: 12,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   boxText: {
-    color: '#fff',
+    color: '#37474f',
     fontSize: 20,
-    fontWeight: '600',
+    fontFamily: 'Poppins-SemiBold',
   },
 });
