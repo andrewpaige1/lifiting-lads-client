@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { UserContext } from '@/Store';
+
 import {
   SafeAreaView,
   View,
@@ -9,6 +12,8 @@ import {
   Image
 } from 'react-native';
 import { useRouter } from 'expo-router';
+
+
 
 // Type definition for activity items
 type Activity = {
@@ -42,6 +47,7 @@ const initialActivities: Activity[] = [
 const ActivityFeed = () => {
   const [activities, setActivities] = useState<Activity[]>(initialActivities);
   const router = useRouter();
+  
 
   // Separate requests from others
   const requests = activities.filter((item) => item.type === 'REQUEST');

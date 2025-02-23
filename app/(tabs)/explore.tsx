@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import { useAuth } from '@/hooks/useAuth';
+import { UserContext } from '@/Store';
 
 const API_URL = "https://lifting-lads-api.onrender.com"
 
@@ -15,6 +17,9 @@ const ExploreScreen = () => {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const userContext = useContext(UserContext);
+const { userInfo } = userContext;
+
 
   // Fetch users as they type
   useEffect(() => {

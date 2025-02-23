@@ -1,11 +1,15 @@
-import React, { useRef } from 'react';
+import React, { useContext, useRef } from 'react';
 import { View, Text, Image, ScrollView, Pressable, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/hooks/useAuth';
+import { UserContext } from '@/Store';
 
 
 export default function Home() {
   const router = useRouter();
   const scrollY = useRef(new Animated.Value(0)).current;
+  const userContext = useContext(UserContext);
+  const { userInfo } = userContext;
 
   // Interpolating the header opacity based on scroll position
   const headerTranslateY = scrollY.interpolate({
@@ -52,7 +56,7 @@ export default function Home() {
             <View style={styles.postHeader}>
               <View style={styles.profileContainer}>
                 <Image
-                  source={{ uri: 'https://via.placeholder.com/50' }}
+                  source={{ uri: userInfo.picture }}
                   style={styles.profileImage}
                 />
                 <Text style={styles.username}>Username</Text>

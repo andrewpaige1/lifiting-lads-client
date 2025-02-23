@@ -21,6 +21,7 @@ const Profile = () => {
   const { handleLogout } = useAuth()
   const userContext = useContext(UserContext);
   const { userInfo } = userContext;
+  
 
   // Set header with back arrow
   useLayoutEffect(() => {
