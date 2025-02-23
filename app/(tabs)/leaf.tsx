@@ -14,6 +14,7 @@ import {
 import * as Location from 'expo-location';
 import axios from 'axios';
 import Constants from 'expo-constants';
+import { useNavigation } from '@react-navigation/native';
 
 const LeafScreen = () => {
   const [gymLocation, setGymLocation] = useState('');
@@ -21,6 +22,8 @@ const LeafScreen = () => {
   const [sustainabilityTip, setSustainabilityTip] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [factLoading, setFactLoading] = useState(false);
+  
+  const navigation = useNavigation(); // Navigation hook
 
   // Get OpenAI API key from app.json
   const openaiApiKey = Constants.expoConfig?.extra?.openaiApiKey;
@@ -110,7 +113,7 @@ const LeafScreen = () => {
       {/* Header with Title and Profile Pic */}
       <View style={styles.headerWrapper}>
         <Text style={styles.header}>Climate Coach</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('profile')}>
           <Image
             source={{ uri: 'https://via.placeholder.com/40' }}
             style={styles.profilePic}
@@ -170,7 +173,7 @@ const styles = StyleSheet.create({
 
   // Header Bar
   headerWrapper: {
-    marginTop: -13, // Reduced space for tighter layout
+    marginTop: -13,
     right: 10,
     marginBottom: 10,
     paddingHorizontal: 20,
@@ -185,9 +188,8 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: '700',
     fontFamily: 'Poppins-Bold',
-    color: '#37474f', // Modern gray for titles
+    color: '#37474f',
     padding: 14,
-
   },
   profilePic: {
     width: 40,

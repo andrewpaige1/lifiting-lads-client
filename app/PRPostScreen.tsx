@@ -1,34 +1,138 @@
-// app/PRPostScreen.tsx
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useNavigation } from 'expo-router';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from './types';  // Import the route types
-
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'PRPostScreen'>;
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image, Alert } from 'react-native';
+import { Video } from 'expo-av';
+import * as MediaLibrary from 'expo-media-library';
+import * as VideoThumbnails from 'expo-video-thumbnails';
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 const PRPostScreen = () => {
-  const navigation = useNavigation<NavigationProp>();
+  const [videoUri, setVideoUri] = useState<string | null>(null);
+  const [videos, setVideos] = useState<{ id: string; uri: string; thumbnail: string | null }[]>([]);
+  const [permissionStatus, setPermissionStatus] = useState<string | null>(null);
+  const navigation = useNavigation();
 
-  const handleUpload = () => {
-    Alert.alert('Upload Video', 'This is where users will upload a video.');
+  // Request media permissions and load videos
+  useEffect(() => {
+    const getPermissionsAndVideos = async () => {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      setPermissionStatus(status);
+
+      if (status === 'granted') {
+        loadVideos();
+      } else {
+        Alert.alert('Permission Required', 'Please enable media access in settings.');
+      }
+    };
+
+    getPermissionsAndVideos();
+  }, []);
+
+  // Load videos and generate thumbnails
+  const loadVideos = async () => {
+    try {
+      const media = await MediaLibrary.getAssetsAsync({
+        mediaType: 'video',
+        first: 30,
+        sortBy: ['creationTime'],
+      });
+
+      const videosWithThumbnails = await Promise.all(
+        media.assets.map(async (asset) => {
+          const assetInfo = await MediaLibrary.getAssetInfoAsync(asset);
+          const fileUri = assetInfo.localUri || asset.uri;
+          const thumbnail = await generateThumbnail(fileUri);
+          return { id: asset.id, uri: fileUri, thumbnail };
+        })
+      );
+
+      setVideos(videosWithThumbnails);
+    } catch (error) {
+      console.error('Failed to load videos:', error);
+    }
+  };
+
+  // Generate video thumbnail
+  const generateThumbnail = async (uri: string) => {
+    try {
+      const { uri: thumbnailUri } = await VideoThumbnails.getThumbnailAsync(uri, {
+        time: 1000,
+      });
+      return thumbnailUri;
+    } catch (error) {
+      console.error('Failed to generate thumbnail:', error);
+      return null;
+    }
+  };
+
+  // Update header with "Next" button
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: '',
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
+          <Ionicons name="close" size={36} color="gray" />
+        </TouchableOpacity>
+      ),
+      headerRight: () =>
+        videoUri ? (
+          <TouchableOpacity onPress={() => navigation.navigate('prePost', { videoUri })}>
+            <Text style={styles.nextButton}>Next</Text>
+          </TouchableOpacity>
+        ) : null,
+    });
+  }, [navigation, videoUri]);
+
+  // Select video from camera roll
+  const selectVideo = (uri: string) => {
+    setVideoUri(uri);
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Post a PR</Text>
 
-      <View style={styles.placeholder}>
-        <Text style={styles.placeholderText}>Video will be shown here</Text>
+      {/* Video Preview Box */}
+      <View style={styles.previewBox}>
+        {videoUri ? (
+          <Video
+            source={{ uri: videoUri }}
+            style={styles.video}
+            useNativeControls
+            resizeMode="contain"
+          />
+        ) : (
+          <Text style={styles.placeholderText}>Select a video to preview it here</Text>
+        )}
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleUpload}>
-        <Text style={styles.buttonText}>Select Video from Camera Roll</Text>
-      </TouchableOpacity>
+      {/* Camera Roll Video Picker */}
+      {permissionStatus === 'granted' ? (
+        <View style={styles.cameraRollContainer}>
+          <Text style={styles.subHeader}>Select a Video from Camera Roll</Text>
 
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('(tabs)')}>
-        <Text style={styles.buttonText}>Back to Post</Text>
-      </TouchableOpacity>
+          <FlatList
+            data={videos}
+            keyExtractor={(item) => item.id}
+            numColumns={3}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => selectVideo(item.uri)} style={styles.thumbnailWrapper}>
+                {item.thumbnail ? (
+                  <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
+                ) : (
+                  <View style={styles.thumbnailPlaceholder}>
+                    <Text style={styles.errorText}>No Thumbnail</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            )}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.cameraRollContent}
+          />
+        </View>
+      ) : (
+        <Text style={styles.errorText}>Permission to access the camera roll is required.</Text>
+      )}
     </View>
   );
 };
@@ -41,44 +145,72 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f8f8f8',
     alignItems: 'center',
-    justifyContent: 'center',
+  },
+  closeButton: {
+    marginLeft: 10,
+  },
+  nextButton: {
+    marginRight: 10,
+    fontSize: 18,
+    color: '#007bff',
+    fontWeight: '600',
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  placeholder: {
+  subHeader: {
+    fontSize: 20,
+    marginBottom: 10,
+    fontWeight: '600',
+    textAlign: 'left',
+    width: '100%',
+  },
+  previewBox: {
     width: '100%',
     height: 300,
     backgroundColor: '#ddd',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
     marginBottom: 20,
+    borderRadius: 10,
+  },
+  video: {
+    width: '100%',
+    height: '100%',
   },
   placeholderText: {
     color: '#666',
     fontSize: 16,
   },
-  button: {
-    padding: 15,
-    backgroundColor: '#007bff',
-    borderRadius: 10,
-    alignItems: 'center',
-    width: '80%',
-    marginBottom: 10,
+  cameraRollContainer: {
+    flex: 1,
+    width: '100%',
+    marginTop: 10,
   },
-  backButton: {
-    padding: 15,
-    backgroundColor: '#dc3545',
-    borderRadius: 10,
-    alignItems: 'center',
-    width: '80%',
+  cameraRollContent: {
+    paddingBottom: 100,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
+  thumbnailWrapper: {
+    margin: 5,
+  },
+  thumbnail: {
+    width: 110,
+    height: 110,
+    borderRadius: 10,
+    backgroundColor: '#ccc',
+  },
+  thumbnailPlaceholder: {
+    width: 110,
+    height: 110,
+    borderRadius: 10,
+    backgroundColor: '#eee',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
   },
 });

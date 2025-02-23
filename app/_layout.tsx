@@ -51,6 +51,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="PRPostScreen" options={{ title: 'Post a PR' }} /> {/* 👈 Added this */}
+          <Stack.Screen name="prePost" options={{ title: 'Preview Post' }} />
           <Stack.Screen name="CameraScreen" options={{ title: 'Post Your Lift' }} /> {/* 👈 Added this */}
           <Stack.Screen name="+not-found" />
         </Stack>

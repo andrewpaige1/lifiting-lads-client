@@ -1,9 +1,12 @@
-// app/post.tsx
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { router } from 'expo-router';
+
+// Get screen dimensions
+const { width, height } = Dimensions.get('window');
+
 // Define route parameters
 type RootStackParamList = {
   PRPostScreen: undefined;
@@ -33,16 +36,16 @@ const PostScreen = () => {
       <View style={styles.headerLine} />
 
       <View style={styles.container}>
-        {/* Post a PR */}
+        {/* PR Post Button */}
         <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('PRPostScreen')}>
-          <Text style={styles.boxText}>🏋️ Post a PR</Text>
+          <Text style={styles.boxText}>🚨 PR Post</Text>
         </TouchableOpacity>
 
-      {/* Post Your Lift */}
-      <TouchableOpacity style={styles.box} onPress={() => router.push('/LiftCam')}>
-        <Text style={styles.boxText}>Post Your Lift</Text>
-      </TouchableOpacity>
-    </View>
+        {/* Live Lift Button */}
+        <TouchableOpacity style={styles.box} onPress={() => router.push('/LiftCam')}>
+          <Text style={styles.boxText}>🏋️ Live Lift</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -57,7 +60,7 @@ const styles = StyleSheet.create({
 
   // Header Bar
   headerBar: {
-    marginTop: 45, // Reduced space for tighter layout
+    marginTop: 30,
     right: 10,
     marginBottom: 10,
     paddingHorizontal: 20,
@@ -69,12 +72,10 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   headerText: {
-    fontSize: 25,
+    fontSize: 28,
     fontWeight: '700',
-    fontFamily: 'Poppins-Bold',
-    color: '#37474f', // Modern gray for titles
+    color: '#37474f',
     padding: 14,
-
   },
   profilePic: {
     width: 40,
@@ -86,38 +87,41 @@ const styles = StyleSheet.create({
   // Decorative Line Under Header
   headerLine: {
     height: 4,
-    backgroundColor: '#ddd', // Light gray to match other screens
+    backgroundColor: '#ddd',
     borderRadius: 2,
     marginHorizontal: 20,
     marginBottom: 10,
   },
 
-  // Main Content Area
+  // Main Content Area (Higher Position)
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: 20,
+    marginTop: height * 0.02,
     backgroundColor: '#f0f2f5',
   },
 
-  // Post Action Box
+  // Bigger Post Action Box
   box: {
-    width: '100%',
-    padding: 100,
-    marginVertical: 12,
-    backgroundColor: '#ffffff', // White card-style
-    borderRadius: 12,
+    width: width * 0.95,
+    paddingVertical: 65,
+    marginVertical: 15,
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 5,
   },
+
+  // Larger Button Text
   boxText: {
     color: '#37474f',
-    fontSize: 30,
-    fontFamily: 'Poppins-SemiBold',
+    fontSize: 34,
+    fontWeight: '800',
   },
 });
