@@ -77,7 +77,7 @@ export function useAuth() {
       `returnTo=${encodeURIComponent(returnTo)}`;
 
     // 3. Open the browser to log out from Auth0
-    await WebBrowser.openBrowserAsync(logoutUrl);
+    WebBrowser.openBrowserAsync(logoutUrl);
     // Close the WebBrowser again (on iOS, might need slightly different flow)
     WebBrowser.dismissBrowser();
   }, []);
