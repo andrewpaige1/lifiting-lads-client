@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 const PrePostScreen = () => {
   const route = useRoute();
@@ -19,6 +20,18 @@ const PrePostScreen = () => {
   const { videoUri } = route.params as { videoUri: string };
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [description, setDescription] = useState<string>('');
+
+  // Add Close Button to Header
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: '',
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
+          <Ionicons name="close" size={36} color="gray" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
 
   // Generate the thumbnail
   useEffect(() => {
@@ -50,7 +63,7 @@ const PrePostScreen = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Text style={styles.header}>Preview & Post</Text>
+        <Text style={styles.header}></Text>
 
         {thumbnail ? (
           <Image source={{ uri: thumbnail }} style={styles.thumbnail} />
@@ -69,7 +82,7 @@ const PrePostScreen = () => {
 
         {/* Disclaimer for tagging */}
         <Text style={styles.disclaimer}>
-          ⭐ Add tags related to your lift for easy discovery.
+          Add tags related to your lift for easy discovery!
         </Text>
 
         <TouchableOpacity style={styles.postButton} onPress={handlePost}>
@@ -92,11 +105,14 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: -30,
+  },
+  closeButton: {
+    paddingLeft: 10,
   },
   thumbnail: {
     width: '100%',
-    height: 300,
+    height: 500,
     borderRadius: 10,
     marginBottom: 20,
   },
