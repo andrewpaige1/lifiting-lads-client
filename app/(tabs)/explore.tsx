@@ -1,29 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
 
-// Sample data for search
-const data = [
-  { id: '1', name: 'Bench Press' },
-  { id: '2', name: 'Deadlift' },
-  { id: '3', name: 'Squat' },
-  { id: '4', name: 'Overhead Press' },
-  { id: '5', name: 'Bicep Curl' },
-];
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://159.91.226.30:3000';
 
 const ExploreScreen = () => {
+  type User = {
+    _id: string;
+    nickname: string;
+    email: string;
+  };
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredData, setFilteredData] = useState(data);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Handle search logic
-  const handleSearch = (text: string) => {
-    setSearchQuery(text);
-    const filtered = data.filter((item) =>
-      item.name.toLowerCase().includes(text.toLowerCase())
-    );
-    setFilteredData(filtered);
-  };
+  // Fetch users as they type
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (searchQuery.length > 1) {
+        setLoading(true);
+        try {
+          const response = await axios.get(`${API_URL}/search-users`, {
+            params: { query: searchQuery },
+          });
+          setFilteredUsers(response.data);
+        } catch (error) {
+          console.error('Failed to fetch users:', error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setFilteredUsers([]);
+      }
+    };
+
+    // Debounce: Avoid rapid requests
+    const debounce = setTimeout(fetchUsers, 300);
+
+    return () => clearTimeout(debounce);
+  }, [searchQuery]);
 
   return (
     <View style={styles.safeArea}>
@@ -43,22 +60,29 @@ const ExploreScreen = () => {
         <TextInput
           style={styles.searchInput}
           placeholder="Find your friends..."
-          //italicize ???
-          
           placeholderTextColor="#90a4ae"
           value={searchQuery}
-          onChangeText={handleSearch}
+          onChangeText={setSearchQuery}
         />
+
+        {/* Loading indicator */}
+        {loading && <Text style={styles.loadingText}>Searching...</Text>}
 
         {/* Search Results */}
         <FlatList
-          data={filteredData}
-          keyExtractor={(item) => item.id}
+          data={filteredUsers}
+          keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <TouchableOpacity style={styles.item}>
-              <Text style={styles.itemText}>{item.name}</Text>
+              <Text style={styles.itemText}>{item.nickname}</Text>
+              <Text style={styles.emailText}>{item.email}</Text>
             </TouchableOpacity>
           )}
+          ListEmptyComponent={
+            !loading && searchQuery.length > 1 && filteredUsers.length === 0 ? (
+              <Text style={styles.emptyText}>No users found</Text>
+            ) : null
+          }
           showsVerticalScrollIndicator={false}
         />
       </View>
@@ -71,12 +95,10 @@ export default ExploreScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f0f2f5', // Modern light background
+    backgroundColor: '#f0f2f5',
   },
-
-  // Header Bar
   headerBar: {
-    marginTop: 45, // Reduced space for tighter layout
+    marginTop: 45,
     right: 10,
     marginBottom: 10,
     paddingHorizontal: 20,
@@ -90,10 +112,8 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 25,
     fontWeight: '700',
-    fontFamily: 'Poppins-Bold',
-    color: '#37474f', // Modern gray for titles
+    color: '#37474f',
     padding: 14,
-
   },
   profilePic: {
     width: 40,
@@ -101,28 +121,31 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#b0bec5',
   },
-
-  // Main Container
   container: {
     flex: 1,
     paddingHorizontal: 20,
     backgroundColor: '#f0f2f5',
   },
-
-  // Search Input
   searchInput: {
     height: 50,
-    borderColor: '#1e88e5', // Deep blue accent
+    borderColor: '#1e88e5',
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 14,
     marginBottom: 20,
     backgroundColor: '#ffffff',
     fontSize: 16,
-    fontFamily: 'Poppins-Italic',
   },
-
-  // Search Item Card
+  loadingText: {
+    textAlign: 'center',
+    color: '#1e88e5',
+    marginBottom: 10,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#757575',
+    marginTop: 10,
+  },
   item: {
     padding: 16,
     backgroundColor: '#ffffff',
@@ -136,35 +159,12 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 18,
-    fontFamily: 'Poppins-Medium',
     color: '#37474f',
-  },
-
-  // Button (if you add interactions)
-  button: {
-    backgroundColor: '#1e88e5', // Deep blue for contrast
-    padding: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 17,
     fontWeight: '600',
-    fontFamily: 'Poppins-SemiBold',
   },
-
-  // Fact Box for Highlights
-  factBox: {
-    padding: 16,
-    backgroundColor: '#e8f5e9', // Soft green for sustainability
-    borderRadius: 12,
-    marginVertical: 10,
-  },
-  factText: {
-    fontSize: 16,
-    color: '#2e7d32',
-    fontFamily: 'Poppins-Medium',
+  emailText: {
+    fontSize: 14,
+    color: '#757575',
+    marginTop: 4,
   },
 });
