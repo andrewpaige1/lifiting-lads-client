@@ -56,7 +56,6 @@ function RootLayoutContent() {
             title="Login to Get Started"
             disabled={!request}
             onPress={handleLogin}
-            color="#ff5733" 
           />
         </View>
       ) : (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,12 @@ import {
   Alert,
   Keyboard,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+import { UserContext } from '@/Store';
 
 const PrePostScreen = () => {
   const route = useRoute();
@@ -20,18 +22,8 @@ const PrePostScreen = () => {
   const { videoUri } = route.params as { videoUri: string };
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [description, setDescription] = useState<string>('');
-
-  // Add Close Button to Header
-  useEffect(() => {
-    navigation.setOptions({
-      headerTitle: '',
-      headerLeft: () => (
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
-          <Ionicons name="close" size={36} color="gray" />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
+  const userContext = useContext(UserContext);
+  const { userInfo } = userContext;
 
   // Generate the thumbnail
   useEffect(() => {
@@ -50,46 +42,79 @@ const PrePostScreen = () => {
   }, [videoUri]);
 
   // Handle post submission
-  const handlePost = () => {
+  const handlePost = async () => {
     if (!description.trim()) {
       Alert.alert('Description Required', 'Please enter a description for your post.');
       return;
     }
 
-    Alert.alert('Post Submitted', `Video: ${videoUri}\nDescription: ${description}`);
-    navigation.goBack();
+    const formData = new FormData();
+    formData.append("video", {
+      uri: videoUri,
+      type: "video/mp4",
+      name: "upload.mp4",
+    } as any); // Cast to any to avoid TypeScript errors
+    formData.append('userInfo', JSON.stringify(userInfo));
+    formData.append('description', description);
+
+    try {
+      const response = await fetch("https://lifting-lads-api.onrender.com/upload-video", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        Alert.alert("Post Submitted");
+        navigation.goBack();
+      } else {
+        Alert.alert("Upload Failed", result.error || "Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error uploading video:", error);
+      Alert.alert("Upload Failed", "An error occurred while uploading the video.");
+    }
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <Text style={styles.header}></Text>
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+      style={styles.container}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.innerContainer}>
+          <Text style={styles.header}>Preview & Post</Text>
 
-        {thumbnail ? (
-          <Image source={{ uri: thumbnail }} style={styles.thumbnail} />
-        ) : (
-          <Text style={styles.placeholder}>Loading thumbnail...</Text>
-        )}
+          {thumbnail ? (
+            <Image source={{ uri: thumbnail }} style={styles.thumbnail} />
+          ) : (
+            <Text style={styles.placeholder}>Loading thumbnail...</Text>
+          )}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Write a description for your lift..."
-          placeholderTextColor="#444"
-          multiline
-          value={description}
-          onChangeText={setDescription}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Write a description for your lift..."
+            placeholderTextColor="#444"
+            multiline
+            value={description}
+            onChangeText={setDescription}
+          />
 
-        {/* Disclaimer for tagging */}
-        <Text style={styles.disclaimer}>
-          Add tags related to your lift for easy discovery!
-        </Text>
+          {/* Disclaimer for tagging */}
+          <Text style={styles.disclaimer}>
+            ⭐ Add tags related to your lift for easy discovery.
+          </Text>
 
-        <TouchableOpacity style={styles.postButton} onPress={handlePost}>
-          <Text style={styles.postButtonText}>Post</Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableWithoutFeedback>
+          <TouchableOpacity style={styles.postButton} onPress={handlePost}>
+            <Text style={styles.postButtonText}>Post</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -98,21 +123,22 @@ export default PrePostScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#f8f8f8',
+  },
+  innerContainer: {
+    flex: 1,
+    padding: 20,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: -30,
-  },
-  closeButton: {
-    paddingLeft: 10,
+    marginBottom: 20,
   },
   thumbnail: {
     width: '100%',
-    height: 500,
+    height: 300,
     borderRadius: 10,
     marginBottom: 20,
   },

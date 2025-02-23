@@ -43,7 +43,7 @@ const ActivityFeed = () => {
   const fetchUserRequests = async (nickname: string) => {
     setRefreshing(true); // Show refresh indicator
     try {
-      const response = await axios.get(`https://lifting-lads-api.onrender.com/upload/lifting-lad-requests/${nickname}`);
+      const response = await axios.get(`https://lifting-lads-api.onrender.com/lifting-lad-requests/${nickname}`);
       const requests = response.data.requests.map((req: any, index: number) => ({
         id: index + 1, // Assigning temporary ID
         type: 'REQUEST',
@@ -72,7 +72,7 @@ const ActivityFeed = () => {
   // Handle Accept Request
   const handleAccept = async (id: number, user: string, friendType: string, picture: string) => {
     try {
-      const response = await axios.post("https://lifting-lads-api.onrender.com/upload/accept-lifting-lad", {
+      const response = await axios.post("https://lifting-lads-api.onrender.com/accept-lifting-lad", {
         requesterName: user,
         requestedName: userInfo.nickname,
         requesterPicture: picture,
