@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import {
   SafeAreaView,
   View,
@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import axios from 'axios';
+import { UserContext } from '@/Store';
 
 const API_URL = "https://lifting-lads-api.onrender.com";
 
@@ -42,6 +43,8 @@ const UserProfile: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute<RouteProp<RootStackParamList, 'UserProfile'>>();
   const { userId } = route.params;
+  const userContext = useContext(UserContext);
+  const { userInfo } = userContext;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -92,6 +95,25 @@ const UserProfile: React.FC = () => {
       )
     : user.posts;
 
+  const addLiftingLad = async () => {
+    try {
+      console.log(user)
+      const response = await axios.post(
+        'https://lifting-lads-api.onrender.com/add-lifting-lad', 
+        {
+          requesterName: userInfo.nickname,
+          requestedName: user.nickname,
+          requesterPicture: userInfo.picture
+        });
+
+      console.log('Response:', response.data);
+      alert('Submitted successfully!');
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Submission failed');
+    }
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={styles.container}>
@@ -107,7 +129,7 @@ const UserProfile: React.FC = () => {
   <TouchableOpacity style={styles.button}>
     <Text style={styles.buttonText}>Add Friend</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.button}>
+  <TouchableOpacity style={styles.button} onPress={addLiftingLad}>
     <Text style={styles.buttonText}>Add Lifting Lad</Text>
   </TouchableOpacity>
 </View>
