@@ -17,6 +17,7 @@ import {
 import * as Location from 'expo-location';
 import axios from 'axios';
 import Constants from 'expo-constants';
+import { Keyboard, TouchableWithoutFeedback } from 'react-native';
 const WORKER_URL = 'https://twilight-mountain-853c.wojcier2.workers.dev';
 
 type LocationCoords = {
@@ -114,30 +115,53 @@ const LeafScreen = () => {
   };
 
   // 🏋️ Handle Gym Selection & Calculate Eco Impact
-  const selectGym = (gym: Gym) => {
-    setSelectedGym(gym);
-    setGymSearch(gym.display_name);
-    setGyms([]);
+const selectGym = async (gym: Gym) => {
+  setSelectedGym(gym);
+  setGymSearch(gym.display_name);
+  setGyms([]);
 
-    if (userLocation) {
-      const distance = haversineDistance(
-        userLocation.latitude,
-        userLocation.longitude,
-        parseFloat(gym.lat),
-        parseFloat(gym.lon)
-      );
+  if (!userLocation) {
+      Alert.alert('Error', 'User location not available.');
+      return;
+  }
 
-      const co2Emission = distance * 0.12;
-      const fuelUsed = (distance / 12).toFixed(2);
-      const tripTime = (distance / 50) * 60;
+  try {
+      // Ensure both user and gym coordinates are available
+      const userLat = userLocation.latitude;
+      const userLon = userLocation.longitude;
+      const gymLat = parseFloat(gym.lat);
+      const gymLon = parseFloat(gym.lon);
+
+      if (isNaN(gymLat) || isNaN(gymLon)) {
+          Alert.alert('Error', 'Invalid gym coordinates.');
+          return;
+      }
+
+      // Calculate the distance using the Haversine formula
+      const distance = haversineDistance(userLat, userLon, gymLat, gymLon);
+
+      // Improved calculations based on average car emissions
+      const co2EmissionPerKm = 0.21; // kg CO₂ per km (average for gasoline cars)
+      const fuelEfficiency = 8.5; // liters per 100 km (average car)
+      const averageSpeed = 60; // km/h
+
+      const co2Emission = (distance * co2EmissionPerKm).toFixed(2);
+      const fuelUsed = ((distance / 100) * fuelEfficiency).toFixed(2);
+      const tripTime = ((distance / averageSpeed) * 60).toFixed(0); // minutes
 
       setEcoImpact(
-        `🌿 Trip Eco Impact:\n🚗 Distance: ${distance.toFixed(2)} km\n🌫️ CO₂ Emission: ${co2Emission.toFixed(2)} kg\n⛽ Fuel Used: ${fuelUsed} liters\n🕰️ Travel Time: ${tripTime.toFixed(0)} mins`
+          `🌿 **Trip Eco Impact:**\n` +
+          `🚗 **Distance:** ${distance.toFixed(2)} km\n` +
+          `🌫️ **CO₂ Emission:** ${co2Emission} kg\n` +
+          `⛽ **Fuel Used:** ${fuelUsed} liters\n` +
+          `🕰️ **Travel Time:** ${tripTime} mins`
       );
-    } else {
-      Alert.alert('Error', 'Failed to get user location.');
-    }
-  };
+  } catch (error) {
+      console.error('Failed to calculate eco impact:', error);
+      Alert.alert('Error', 'Failed to calculate eco impact.');
+  }
+};
+
 // R937iL9pcBW8fplXc5IFfMx72lwl4Vm201DpU-BJ
   // 🌟 Fetch Sustainability Fun Fact from Cloudflare Worker
 
@@ -250,12 +274,26 @@ const LeafScreen = () => {
             />
           )}
 
-          {selectedGym && ecoImpact && (
+          {/* {selectedGym && ecoImpact && (
             <View style={styles.resultBox}>
               <Text style={styles.resultText}>🏋️ Selected Gym: {selectedGym.display_name}</Text>
               <Text style={styles.resultText}>{ecoImpact}</Text>
             </View>
+          )} */}
+          {ecoImpact && (
+            <View style={styles.resultBox}>
+              <Text style={styles.resultText}>
+                🏋️ Selected Gym: {selectedGym?.display_name}
+              </Text>
+              <Text style={styles.resultText}>{ecoImpact}</Text>
+
+              {/* Clear Button */}
+              <TouchableOpacity style={styles.clearButton} onPress={() => setEcoImpact(null)}>
+                <Text style={styles.clearButtonText}>Clear Eco Impact</Text>
+              </TouchableOpacity>
+            </View>
           )}
+
 
           {funFact && (
             <View style={styles.funFactBox}>
@@ -276,7 +314,7 @@ const LeafScreen = () => {
             {factLoading ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>🌟 Generate Fun Fact</Text>
+              <Text style={styles.buttonText}>🌎 Generate Green Positive Fact</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -335,7 +373,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 16,
-    color: '#007bff',
+    color: '#3E8E41',
     fontWeight: '500',
   },
   input: {
@@ -348,6 +386,23 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontSize: 16,
   },
+  clearButton: {
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    paddingLeft: 7,
+    paddingRight: 7,
+    backgroundColor: '#3E8E41',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  
+  clearButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  
   suggestionItem: {
     padding: 10,
     borderBottomWidth: 1,
@@ -398,7 +453,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 30,
     marginBottom: 40,
-    backgroundColor: '#0077cc',
+    backgroundColor: '#3E8E41',
     borderRadius: 30,
     alignItems: 'center',
     shadowColor: '#000',
