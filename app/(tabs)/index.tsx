@@ -1,74 +1,101 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { View, Text, Image, ScrollView, Pressable, StyleSheet } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-
-export default function HomeScreen() {
+export default function Home() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/dumbbell.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title"> Hi!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <ScrollView style={styles.container}>
+      {/* Title */}
+      <Text style={styles.title}>Lifting Lads</Text>
+      
+      {/* Post List */}
+      {[...Array(7)].map((_, index) => (
+        <Pressable 
+          key={index}
+          onPressIn={() => console.log('Pressed in')}
+          onPressOut={() => console.log('Pressed out')}
+          style={styles.postContainer}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.profileContainer}>
+              <View style={styles.placeholderProfile}></View>
+              <Image 
+                source={{ uri: 'https://via.placeholder.com/50' }} 
+                style={styles.profileImage}
+              />
+              <Text style={styles.username}>Username</Text>
+            </View>
+            <Text style={styles.date}>Feb 22, 2025</Text>
+          </View>
+          
+          {/* Post Content */}
+          <View style={styles.postContent}></View>
+          
+          {/* Description */}
+          <Text style={styles.description}>Description goes here...</Text>
+        </Pressable>
+      ))}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+    padding: 16,
+    paddingTop: 48,
   },
-  stepContainer: {
-    gap: 8,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16,
+    marginTop: 16,
+  },
+  postContainer: {
+    backgroundColor: '#f3f3f3',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-}
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  placeholderProfile: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#ccc',
+    marginRight: 8,
+  },
+  profileImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
+  username: {
+    marginLeft: 8,
+    fontWeight: '600',
+  },
+  date: {
+    color: '#888',
+  },
+  postContent: {
+    height: 330,
+    backgroundColor: '#ccc',
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  description: {
+    color: '#666',
+  },
 });
