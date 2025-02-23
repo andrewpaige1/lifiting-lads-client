@@ -1,18 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import {
   SafeAreaView,
   View,
   Text,
   StyleSheet,
-  FlatList
+  FlatList,
+  TouchableOpacity
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const Profile = () => {
   const [open, setOpen] = useState(false);
   const [liftFilter, setLiftFilter] = useState(null);
+  const navigation = useNavigation();
 
-  // Dropdown items for types of lifts (plus 'All Lifts').
+  // Set header with back arrow
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
+          <Ionicons name="arrow-back" size={28} color="white" />
+        </TouchableOpacity>
+      ),
+      title: 'Your Profile',  // Optional: Change the title if needed
+    });
+  }, [navigation]);
+
+  // Dropdown items for types of lifts (plus 'All Lifts')
   const [items, setItems] = useState([
     { label: 'All Lifts', value: 'all' },
     { label: 'Squat', value: 'squat' },
@@ -21,7 +37,7 @@ const Profile = () => {
     { label: 'Hang Clean', value: 'hangclean' },
   ]);
 
-  // 20 sample posts (ID 20 is the most recent).
+  // Sample posts
   const [posts] = useState([
     { id: 20, type: 'squat', content: 'Another big PR attempt: 400 for a single!' },
     { id: 19, type: 'bench', content: 'Narrow grip bench: 185 x 8 reps.' },
@@ -45,13 +61,13 @@ const Profile = () => {
     { id: 1, type: 'squat', content: 'High volume day with 225lbs.' },
   ]);
 
-  // Filter logic based on dropdown value
+  // Filter logic
   const filteredPosts =
     liftFilter === 'all' || liftFilter === null
       ? posts
       : posts.filter((p) => p.type === liftFilter);
 
-  // Render each post as a box in the grid
+  // Render post
   const renderPostItem = ({ item }) => (
     <View style={styles.postBox}>
       <Text style={styles.postType}>{item.type.toUpperCase()}</Text>
@@ -90,7 +106,7 @@ const Profile = () => {
           />
         </View>
 
-        {/* Posts Grid (2 columns) */}
+        {/* Posts Grid */}
         <FlatList
           data={filteredPosts}
           keyExtractor={(item) => item.id.toString()}
@@ -153,7 +169,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   postsContainer: {
-    paddingBottom: 100, // extra space at bottom so last items aren't cut off
+    paddingBottom: 100,
   },
   postBox: {
     backgroundColor: '#f0f0f0',
