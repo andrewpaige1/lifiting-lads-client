@@ -17,7 +17,6 @@ import {
 import * as Location from 'expo-location';
 import axios from 'axios';
 import Constants from 'expo-constants';
-import { useNavigation } from '@react-navigation/native';
 
 type LocationCoords = {
   latitude: number;
@@ -44,7 +43,6 @@ const LeafScreen = () => {
 
   const openaiApiKey = Constants.expoConfig?.extra?.openaiApiKey;
 
-  // 📍 Get User's Current Location
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -57,7 +55,6 @@ const LeafScreen = () => {
       const { latitude, longitude } = location.coords;
       setUserLocation({ latitude, longitude });
 
-      // Reverse Geocode to get user address
       try {
         const response = await axios.get(
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
@@ -134,7 +131,7 @@ const LeafScreen = () => {
       const tripTime = (distance / 50) * 60;
 
       setEcoImpact(
-        `🌿 **Trip Eco Impact:**\n🚗 Distance: ${distance.toFixed(2)} km\n🌫️ CO₂ Emission: ${co2Emission.toFixed(2)} kg\n⛽ Fuel Used: ${fuelUsed} liters\n🕰️ Travel Time: ${tripTime.toFixed(0)} mins`
+        `🌿 Trip Eco Impact:\n🚗 Distance: ${distance.toFixed(2)} km\n🌫️ CO₂ Emission: ${co2Emission.toFixed(2)} kg\n⛽ Fuel Used: ${fuelUsed} liters\n🕰️ Travel Time: ${tripTime.toFixed(0)} mins`
       );
     } else {
       Alert.alert('Error', 'Failed to get user location.');
@@ -162,7 +159,7 @@ const LeafScreen = () => {
             },
           ],
           temperature: 0.7,
-          max_tokens: 150,
+          max_tokens: 1,
         },
         {
           headers: {
@@ -186,7 +183,7 @@ const LeafScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerWrapper}>
         <Text style={styles.header}>🌿 Climate Coach</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('profile')}>
+        <TouchableOpacity>
           <Image source={{ uri: 'https://via.placeholder.com/40' }} style={styles.profilePic} />
         </TouchableOpacity>
       </View>
@@ -195,8 +192,6 @@ const LeafScreen = () => {
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.content}>
-
-          {/* 📍 User Location */}
           {userAddress ? (
             <View style={styles.locationBox}>
               <Text style={styles.locationText}>📍 Your Location: {userAddress}</Text>
@@ -205,7 +200,6 @@ const LeafScreen = () => {
             <ActivityIndicator size="small" color="#007bff" />
           )}
 
-          {/* 🏋️ Gym Search */}
           <TextInput
             style={styles.input}
             placeholder="Search nearby gyms (e.g., Planet Fitness, Crunch)..."
@@ -213,7 +207,6 @@ const LeafScreen = () => {
             onChangeText={searchGyms}
           />
 
-          {/* Dropdown for Gym Suggestions */}
           {gyms.length > 0 && (
             <FlatList
               data={gyms}
@@ -226,7 +219,6 @@ const LeafScreen = () => {
             />
           )}
 
-          {/* 🌿 Eco Impact Output */}
           {selectedGym && ecoImpact && (
             <View style={styles.resultBox}>
               <Text style={styles.resultText}>🏋️ Selected Gym: {selectedGym.display_name}</Text>
@@ -234,7 +226,6 @@ const LeafScreen = () => {
             </View>
           )}
 
-          {/* 🌟 Fun Fact Display */}
           {funFact && (
             <View style={styles.funFactBox}>
               <Text style={styles.funFactHeader}>🌍 Sustainability Tip</Text>
@@ -243,7 +234,6 @@ const LeafScreen = () => {
           )}
         </ScrollView>
 
-        {/* 🌟 Fixed Fun Fact Button */}
         <View style={styles.bottomButtonWrapper}>
           <TouchableOpacity style={styles.factButton} onPress={fetchFunFact} disabled={factLoading}>
             {factLoading ? (
@@ -281,8 +271,6 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: '700',
     color: '#37474f',
-    fontFamily: 'Poppins-Bold',
-    color: '#37474f',
     padding: 14,
   },
   profilePic: {
@@ -300,17 +288,13 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 20,
-    paddingBottom: 80,
+    paddingBottom: 150,
   },
   locationBox: {
     padding: 12,
     backgroundColor: '#e6f7ff',
     borderRadius: 12,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
   },
   locationText: {
     fontSize: 16,
@@ -344,26 +328,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#d4edda',
     borderRadius: 12,
     marginTop: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
   },
   resultText: {
     fontSize: 16,
     color: '#333',
-    marginBottom: 5,
     lineHeight: 22,
   },
   funFactBox: {
     padding: 15,
     backgroundColor: '#fff3cd',
     borderRadius: 12,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    marginBottom: 20,
   },
   funFactHeader: {
     fontSize: 18,
@@ -378,15 +353,21 @@ const styles = StyleSheet.create({
   },
   bottomButtonWrapper: {
     padding: 10,
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#ddd',
   },
   factButton: {
-    padding: 30,
-    backgroundColor: '#007bff',
-    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    marginBottom: 40,
+    backgroundColor: '#0077cc',
+    borderRadius: 30,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
   },
   buttonText: {
     color: '#fff',
