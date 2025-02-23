@@ -7,14 +7,17 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
-  Keyboard
+  Keyboard,
+  Button
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '@/hooks/useAuth';
 
 const Profile = () => {
   const [tagSearch, setTagSearch] = useState('#');
   const navigation = useNavigation();
+  const { handleLogout } = useAuth()
 
   // Set header with back arrow
   useLayoutEffect(() => {
@@ -103,6 +106,7 @@ const Profile = () => {
         <Text style={styles.bio}>
           Passionate about lifting and hitting new PRs. Let’s get stronger together!
         </Text>
+        <Button title="Log out" onPress={handleLogout}/>
 
         {/* Tag Search with Clear Button */}
         <View style={styles.searchWrapper}>
