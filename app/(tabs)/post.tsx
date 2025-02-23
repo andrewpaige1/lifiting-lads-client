@@ -36,14 +36,14 @@ const PostScreen = () => {
       <View style={styles.headerLine} />
 
       <View style={styles.container}>
-        {/* Post a PR */}
+        {/* PR Post Button */}
         <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('PRPostScreen')}>
-          <Text style={styles.boxText}>🏋️ Post a PR</Text>
+          <Text style={styles.boxText}>🚨 PR Post</Text>
         </TouchableOpacity>
 
-        {/* Post Your Lift (with Camera Icon) */}
+        {/* Live Lift Button */}
         <TouchableOpacity style={styles.box} onPress={() => router.push('/LiftCam')}>
-          <Text style={styles.boxText}>📷 Post Your Lift</Text>
+          <Text style={styles.boxText}>🏋️ Live Lift</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -99,14 +99,14 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginTop: height * 0.02, // Move content higher up
+    marginTop: height * 0.02,
     backgroundColor: '#f0f2f5',
   },
 
   // Bigger Post Action Box
   box: {
-    width: width * 0.95,    // 95% of screen width
-    paddingVertical: 65,    // Increased padding for bigger buttons
+    width: width * 0.95,
+    paddingVertical: 65,
     marginVertical: 15,
     backgroundColor: '#ffffff',
     borderRadius: 20,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   // Larger Button Text
   boxText: {
     color: '#37474f',
-    fontSize: 34,           // Even larger text size
+    fontSize: 34,
     fontWeight: '800',
   },
 });

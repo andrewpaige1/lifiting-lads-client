@@ -5,15 +5,15 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity
+  TouchableOpacity,
+  TextInput,
+  Keyboard
 } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const Profile = () => {
-  const [open, setOpen] = useState(false);
-  const [liftFilter, setLiftFilter] = useState(null);
+  const [tagSearch, setTagSearch] = useState('#');
   const navigation = useNavigation();
 
   // Set header with back arrow
@@ -24,102 +24,136 @@ const Profile = () => {
           <Ionicons name="arrow-back" size={28} color="white" />
         </TouchableOpacity>
       ),
-      title: 'Your Profile',  // Optional: Change the title if needed
+      title: 'Your Profile',
     });
   }, [navigation]);
 
-  // Dropdown items for types of lifts (plus 'All Lifts')
-  const [items, setItems] = useState([
-    { label: 'All Lifts', value: 'all' },
-    { label: 'Squat', value: 'squat' },
-    { label: 'Bench', value: 'bench' },
-    { label: 'Deadlift', value: 'deadlift' },
-    { label: 'Hang Clean', value: 'hangclean' },
-  ]);
+  // Sample posts with PR and Live Lift classifications
+  const posts = [
+    { id: 1, type: 'pr', content: 'Hit a new PR today!', tags: ['#pr', '#squat', '#fitness'] },
+    { id: 2, type: 'live', content: 'Working on my form.', tags: ['#bench', '#form', '#strength'] },
+    { id: 3, type: 'pr', content: '400lbs deadlift!!', tags: ['#deadlift', '#pr', '#powerlifting'] },
+    { id: 4, type: 'live', content: 'Hang cleans for explosiveness.', tags: ['#hangclean', '#explosive', '#training'] },
+    { id: 5, type: 'pr', content: 'High volume squat day.', tags: ['#squat', '#volume', '#grind'] },
+    { id: 6, type: 'live', content: 'Bench press burnout set!', tags: ['#bench', '#burnout', '#fitness'] },
+    { id: 7, type: 'live', content: 'Post-recovery stretch routine.', tags: ['#recovery', '#mobility', '#stretch'] },
+    { id: 8, type: 'pr', content: 'Deadlifts felt amazing!', tags: ['#deadlift', '#gains', '#power'] },
+    { id: 9, type: 'live', content: 'Push press PR! 185lbs!', tags: ['#pushpress', '#pr', '#strength'] },
+    { id: 10, type: 'live', content: 'Cardio day: 5 miles done!', tags: ['#cardio', '#running', '#endurance'] },
+  ];
 
-  // Sample posts
-  const [posts] = useState([
-    { id: 20, type: 'squat', content: 'Another big PR attempt: 400 for a single!' },
-    { id: 19, type: 'bench', content: 'Narrow grip bench: 185 x 8 reps.' },
-    { id: 18, type: 'deadlift', content: 'Sumo deadlift day: 405 for a triple.' },
-    { id: 17, type: 'hangclean', content: 'Working technique at 135, focusing on form.' },
-    { id: 16, type: 'squat', content: 'Deload week: 225 for sets of 5.' },
-    { id: 15, type: 'bench', content: 'Incline bench day, repping 155.' },
-    { id: 14, type: 'deadlift', content: 'Paused deadlifts at 315—killer on the core!' },
-    { id: 13, type: 'hangclean', content: 'Cleans from the hang, 5 sets of 3 at 135.' },
-    { id: 12, type: 'squat', content: 'Speed work at 185, 8x3 focusing on explosiveness.' },
-    { id: 11, type: 'bench', content: 'Flat bench, 205 for 3 sets of 6.' },
-    { id: 10, type: 'deadlift', content: 'Pulled 435 for a double—feeling strong!' },
-    { id: 9, type: 'squat', content: 'New PR! 365lbs for a single.' },
-    { id: 8, type: 'bench', content: 'Benched 245 today, feeling strong!' },
-    { id: 7, type: 'deadlift', content: 'Pulled 455 for 2 reps. PR!' },
-    { id: 6, type: 'hangclean', content: 'Hit 200lbs clean today!' },
-    { id: 5, type: 'squat', content: '5x5 with 275lbs. Solid session.' },
-    { id: 4, type: 'bench', content: '3 sets of 10 at 185lbs.' },
-    { id: 3, type: 'deadlift', content: 'Worked up to 405 for triples.' },
-    { id: 2, type: 'hangclean', content: 'Practiced form at 155lbs.' },
-    { id: 1, type: 'squat', content: 'High volume day with 225lbs.' },
-  ]);
+  // Frequency count for tag suggestions
+  const tagFrequency = posts
+    .flatMap((post) => post.tags)
+    .reduce((acc, tag) => {
+      acc[tag] = (acc[tag] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
-  // Filter logic
-  const filteredPosts =
-    liftFilter === 'all' || liftFilter === null
-      ? posts
-      : posts.filter((p) => p.type === liftFilter);
+  // Filtered posts based on search input
+  const filteredPosts = tagSearch.length > 1
+    ? posts.filter((post) =>
+        post.tags.some((tag) =>
+          tag.toLowerCase().includes(tagSearch.slice(1).toLowerCase())
+        )
+      )
+    : posts;
 
-  // Render post
+  // Get matching tags by frequency
+  const matchingTags = Object.keys(tagFrequency)
+    .filter((tag) => tag.toLowerCase().includes(tagSearch.slice(1).toLowerCase()))
+    .sort((a, b) => tagFrequency[b] - tagFrequency[a]);
+
+  // Clear search but keep #
+  const clearSearch = () => {
+    setTagSearch('#');
+  };
+
+  // Render each post with classification
   const renderPostItem = ({ item }) => (
-    <View style={styles.postBox}>
-      <Text style={styles.postType}>{item.type.toUpperCase()}</Text>
+    <View
+      style={[
+        styles.postBox,
+        item.type === 'pr' ? styles.prPost : styles.liveLiftPost,
+      ]}
+    >
+      <Text style={styles.postType}>
+        {item.type === 'pr' ? '🚨 PR Post' : '🏋️ Live Lift'}
+      </Text>
       <Text style={styles.postContent}>{item.content}</Text>
+      <View style={styles.tagContainer}>
+        {item.tags.map((tag) => (
+          <Text key={tag} style={styles.tag}>
+            {tag}
+          </Text>
+        ))}
+      </View>
     </View>
   );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={styles.container}>
-        {/* Profile Picture Placeholder */}
+        {/* Profile Header */}
         <View style={styles.profilePictureContainer}>
           <View style={styles.profilePicture} />
         </View>
 
-        {/* Username */}
         <Text style={styles.username}>lifting_lad_123</Text>
-
-        {/* Bio */}
         <Text style={styles.bio}>
           Passionate about lifting and hitting new PRs. Let’s get stronger together!
         </Text>
 
-        {/* Dropdown Filter */}
-        <View style={styles.dropdownWrapper}>
-          <DropDownPicker
-            open={open}
-            value={liftFilter}
-            items={items}
-            setOpen={setOpen}
-            setValue={setLiftFilter}
-            setItems={setItems}
-            placeholder="All Lifts"
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropdownContainer}
+        {/* Tag Search with Clear Button */}
+        <View style={styles.searchWrapper}>
+          <TextInput
+            style={styles.searchInput}
+            value={tagSearch}
+            onChangeText={(text) =>
+              setTagSearch(text.startsWith('#') ? text : `#${text}`)
+            }
+            placeholder="#Search by tag"
+            placeholderTextColor="#999"
           />
+          {tagSearch.length > 1 && (
+            <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
+              <Ionicons name="close-circle" size={24} color="#888" />
+            </TouchableOpacity>
+          )}
         </View>
 
-        {/* Posts Grid */}
+        {/* Tag Suggestions */}
+        {tagSearch.length > 1 && (
+          <View style={styles.tagSuggestions}>
+            {matchingTags.map((tag) => (
+              <TouchableOpacity
+                key={tag}
+                style={styles.suggestedTag}
+                onPress={() => setTagSearch(tag)}
+              >
+                <Text style={styles.suggestedTagText}>
+                  {tag} ({tagFrequency[tag]})
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Posts List */}
         <FlatList
           data={filteredPosts}
           keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-          columnWrapperStyle={styles.columnWrapper}
           renderItem={renderPostItem}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.postsContainer}
+          keyboardShouldPersistTaps="handled" // Allows tapping outside the keyboard to dismiss
         />
       </View>
     </SafeAreaView>
   );
 };
+
+export default Profile;
 
 const styles = StyleSheet.create({
   container: {
@@ -135,7 +169,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 30,
+    marginTop: 10,
     marginBottom: 10,
   },
   profilePicture: {
@@ -145,49 +179,98 @@ const styles = StyleSheet.create({
     backgroundColor: '#ddd',
   },
   username: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 5,
   },
   bio: {
-    fontSize: 15,
-    marginBottom: 35,
+    fontSize: 16,
+    marginBottom: 20,
     textAlign: 'center',
   },
-  dropdownWrapper: {
+  searchWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     width: '100%',
-    marginBottom: 20,
+    marginBottom: 10,
+    position: 'relative',
   },
-  dropdown: {
-    borderColor: '#ccc',
-    height: 40,
+  searchInput: {
+    flex: 1,
+    height: 50,
+    borderColor: '#007bff',
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    fontSize: 18,
+    backgroundColor: '#f8f8f8',
   },
-  dropdownContainer: {
-    borderColor: '#ccc',
+  clearButton: {
+    position: 'absolute',
+    right: 10,
   },
-  columnWrapper: {
-    justifyContent: 'space-between',
+  tagSuggestions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 10,
+    width: '100%',
+  },
+  suggestedTag: {
+    backgroundColor: '#007bff',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    marginRight: 10,
+    marginBottom: 5,
+  },
+  suggestedTagText: {
+    color: '#fff',
+    fontSize: 14,
   },
   postsContainer: {
-    paddingBottom: 100,
+    paddingBottom: 20,
+    width: '100%',
   },
   postBox: {
-    backgroundColor: '#f0f0f0',
-    width: '48%',
+    width: '100%',
     marginBottom: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    padding: 10,
+    borderRadius: 10,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  prPost: {
+    backgroundColor: '#ffebee', // Light red for PR posts
+  },
+  liveLiftPost: {
+    backgroundColor: '#e3f2fd', // Light blue for Live Lifts
   },
   postType: {
+    fontSize: 14,
     fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#555',
+  },
+  postContent: {
     fontSize: 16,
     marginBottom: 5,
   },
-  postContent: {
+  tagContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 5,
+  },
+  tag: {
+    backgroundColor: '#007bff',
+    color: '#fff',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 15,
+    marginRight: 5,
+    marginBottom: 5,
     fontSize: 14,
-    textAlign: 'center',
   },
 });
-
-export default Profile;
