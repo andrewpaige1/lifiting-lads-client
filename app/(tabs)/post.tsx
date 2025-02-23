@@ -1,9 +1,9 @@
 // app/post.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
+import { router } from 'expo-router';
 // Define route parameters
 type RootStackParamList = {
   PRPostScreen: undefined;
@@ -17,7 +17,6 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const PostScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Create a New Post</Text>
@@ -28,7 +27,7 @@ const PostScreen = () => {
       </TouchableOpacity>
 
       {/* Post Your Lift */}
-      <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('CameraScreen')}>
+      <TouchableOpacity style={styles.box} onPress={() => router.push('/CameraScreen')}>
         <Text style={styles.boxText}>Post Your Lift</Text>
       </TouchableOpacity>
     </View>

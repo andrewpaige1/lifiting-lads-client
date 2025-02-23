@@ -1,96 +1,89 @@
-// app/CameraScreen.tsx
-/*import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Camera, CameraType } from 'expo-camera/next';
-import { useNavigation } from '@react-navigation/native';
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { useRef, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
 
-const CameraScreen = () => {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [type, setType] = useState<'front' | 'back'>('back');
-  const cameraRef = useRef<React.ElementRef<typeof Camera>>(null);
-  const navigation = useNavigation();
+export default function CameraScreen() {
+  const [facing, setFacing] = useState<CameraType>('back');
+  const [permission, requestPermission] = useCameraPermissions();
+  const cameraRef = useRef<any>(null);
 
-  // Request Camera Permission
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
-
-  // Take Picture
-  const takePicture = async () => {
-    if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
-      console.log('Photo taken:', photo.uri);
-      alert('Photo taken successfully!');
-    }
-  };
-
-  if (hasPermission === null) {
-    return <Text>Requesting camera permission...</Text>;
+  if (!permission) {
+    return <View />;
   }
 
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+  if (!permission.granted) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>We need your permission to show the camera</Text>
+        <TouchableOpacity onPress={requestPermission} style={styles.button}>
+          <Text style={styles.text}>Grant Permission</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  function toggleCameraFacing() {
+    setFacing((current) => (current === 'back' ? 'front' : 'back'));
+  }
+
+  async function takePicture() {
+    if (cameraRef.current) {
+      const photoData = await cameraRef.current.takePictureAsync();
+      router.push({
+        pathname: '/ViewPicture',
+        params: { imageUri: photoData.uri }, // Pass image URI to ViewPicture component
+      });
+    }
   }
 
   return (
     <View style={styles.container}>
-      <Camera ref={cameraRef} style={styles.camera} type={type}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.flipButton}
-            onPress={() => setType(type === 'back' ? 'front' : 'back')}
-          >
-            <Text style={styles.text}>Flip Camera</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
-            <Text style={styles.text}>Take Picture</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.text}>Go Back</Text>
-          </TouchableOpacity>
-        </View>
-      </Camera>
+      {/* Buttons Positioned Above Camera */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+          <Text style={styles.text}>Flip Camera</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={takePicture}>
+          <Text style={styles.text}>Take Photo</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Camera View */}
+      <CameraView ref={cameraRef} style={styles.camera} facing={facing} />
     </View>
   );
-};
-
-export default CameraScreen;
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  message: {
+    textAlign: 'center',
+    paddingBottom: 10,
+  },
   camera: {
     flex: 1,
   },
   buttonContainer: {
-    flex: 1,
-    backgroundColor: 'transparent',
+    position: 'absolute',
+    top: 50,
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-around',
-    alignItems: 'flex-end',
-    paddingBottom: 30,
+    zIndex: 1,
   },
-  flipButton: {
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 5,
-  },
-  captureButton: {
-    backgroundColor: '#28a745',
-    padding: 10,
-    borderRadius: 5,
-  },
-  backButton: {
-    backgroundColor: '#dc3545',
-    padding: 10,
-    borderRadius: 5,
+  button: {
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
   },
   text: {
-    color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
   },
-});*/
+});
+
