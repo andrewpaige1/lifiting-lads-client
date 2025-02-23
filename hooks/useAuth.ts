@@ -22,7 +22,7 @@ export function useAuth() {
   const redirectUri = AuthSession.makeRedirectUri({
     scheme: 'liftinglads', // Must match the "scheme" in your app.json or app.config.js
   });
-
+  console.log(redirectUri)
   // Set up the authentication request
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {

@@ -1,40 +1,75 @@
-import { View, Text, Image, ScrollView, Pressable, StyleSheet } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, Image, ScrollView, Pressable, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { useRouter } from 'expo-router';
 
 export default function Home() {
+  const router = useRouter();
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  // Interpolating the header opacity based on scroll position
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, 100],  // Start hiding after 100px scroll
+    outputRange: [0, -100], // Move header up by 60px
+    extrapolate: 'clamp',
+  });
+
+  const goToProfile = () => {
+    router.push('/profile');
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      {/* Title */}
-      <Text style={styles.title}>Lifting Lads</Text>
-      
-      {/* Post List */}
-      {[...Array(7)].map((_, index) => (
-        <Pressable 
-          key={index}
-          onPressIn={() => console.log('Pressed in')}
-          onPressOut={() => console.log('Pressed out')}
-          style={styles.postContainer}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.profileContainer}>
-              <View style={styles.placeholderProfile}></View>
-              <Image 
-                source={{ uri: 'https://via.placeholder.com/50' }} 
-                style={styles.profileImage}
-              />
-              <Text style={styles.username}>Username</Text>
+    <View style={styles.container}>
+      {/* Animated Header */}
+      <Animated.View style={[styles.headerBar, { transform: [{ translateY: headerTranslateY }] }]}>
+        <Text style={styles.title}>Lifting Lads</Text>
+
+        {/* Profile Pic Button (Top-Right Corner) */}
+        <TouchableOpacity onPress={goToProfile}>
+          <Image
+            source={{ uri: 'https://via.placeholder.com/40' }}
+            style={styles.profilePic}
+          />
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* Scrollable Post List */}
+      <Animated.ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={{ paddingTop: 80 }}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16}
+      >
+        {[...Array(10)].map((_, index) => (
+          <Pressable
+            key={index}
+            onPressIn={() => console.log('Pressed in')}
+            onPressOut={() => console.log('Pressed out')}
+            style={styles.postContainer}
+          >
+            {/* Post Header */}
+            <View style={styles.header}>
+              <View style={styles.profileContainer}>
+                <Image
+                  source={{ uri: 'https://via.placeholder.com/50' }}
+                  style={styles.profileImage}
+                />
+                <Text style={styles.username}>Username</Text>
+              </View>
+              <Text style={styles.date}>Feb 22, 2025</Text>
             </View>
-            <Text style={styles.date}>Feb 22, 2025</Text>
-          </View>
-          
-          {/* Post Content */}
-          <View style={styles.postContent}></View>
-          
-          {/* Description */}
-          <Text style={styles.description}>Description goes here...</Text>
-        </Pressable>
-      ))}
-    </ScrollView>
+
+            {/* Post Content */}
+            <View style={styles.postContent} />
+
+            {/* Description */}
+            <Text style={styles.description}>Description goes here...</Text>
+          </Pressable>
+        ))}
+      </Animated.ScrollView>
+    </View>
   );
 }
 
@@ -42,15 +77,41 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    padding: 16,
-    paddingTop: 48,
+  },
+  headerBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    marginTop: 20,
+    marginBottom: 20
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 16,
-    marginTop: 16,
+  },
+  profilePic: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#ccc',
+  },
+  scrollContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+    marginBottom: 10,
   },
   postContainer: {
     backgroundColor: '#f3f3f3',
@@ -70,20 +131,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  placeholderProfile: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#ccc',
-    marginRight: 8,
-  },
   profileImage: {
     width: 48,
     height: 48,
     borderRadius: 24,
+    marginRight: 8,
   },
   username: {
-    marginLeft: 8,
     fontWeight: '600',
   },
   date: {
