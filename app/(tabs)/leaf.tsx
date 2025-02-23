@@ -19,7 +19,7 @@ export default function ActivityScreen() {
                 />
             }>
             <ThemedView style={styles.titleContainer}>
-                <ThemedText type="title">Activity</ThemedText>
+                <ThemedText type="title">Leaf</ThemedText>
                 <HelloWave />
             </ThemedView>
         </ParallaxScrollView>

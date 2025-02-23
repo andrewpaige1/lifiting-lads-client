@@ -36,21 +36,21 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="post"
-        options={{
-          title: 'Post',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.circle.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
         name="explore"
         options={{
           title: 'Search',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="map.fill" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="post"
+        options={{
+          title: 'Post',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.circle.fill" color={color} />,
+        }}
+      />
       
-      {/* <Tabs.Screen
+      <Tabs.Screen
         name="activity"
         options={{
           title: 'Activity',
@@ -58,6 +58,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="leaf"
+        options={{
+          title: 'Leaf',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="bell.fill" color={color} />,
+        }}
+      />
+      {/* <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',

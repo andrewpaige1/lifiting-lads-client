@@ -1,7 +1,7 @@
 // app/CameraScreen.tsx
-import React, { useRef, useState, useEffect } from 'react';
+/*import React, { useRef, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Camera, CameraType } from 'expo-camera/next';
+import { Camera, CameraType } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
 
 const CameraScreen = () => {
@@ -93,4 +93,4 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
-});
+});*/
