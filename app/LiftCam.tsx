@@ -2,12 +2,28 @@ import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { useState, useRef } from 'react';
 import { Button, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useLayoutEffect } from 'react';
 
 export default function App() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<any>(null);
   const [photo, setPhoto] = useState(null); // Store captured image
+  const navigation = useNavigation();
+
+  // Add Close Button to Header
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: '',
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
+          <Ionicons name="close" size={36} color="gray" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
 
   if (!permission) {
     return <View />;
@@ -51,10 +67,10 @@ export default function App() {
       {/* Camera Controls positioned above the bottom tabs */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-          <Text style={styles.text}>Flip</Text>
+          <Ionicons name="camera-reverse-outline" size={40} color="#000" style={[styles.icon, { borderRadius: 20 }]} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
-          <Text style={styles.text}>📸</Text>
+        <TouchableOpacity style={styles.button} onPress={takePicture}>
+          <Ionicons name="camera-outline" size={40} color="#000" style={[styles.icon, { borderRadius: 20 }]} />
         </TouchableOpacity>
       </View>
     </View>
@@ -83,7 +99,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: 100, // Position above bottom tabs
+    bottom: 100,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
@@ -93,16 +109,17 @@ const styles = StyleSheet.create({
   button: {
     padding: 15,
     backgroundColor: '#fff',
-    borderRadius: 30,
+    borderRadius: 20,
   },
-  captureButton: {
-    padding: 20,
-    borderRadius: 50,
+  icon: {
+    borderRadius: 20,
   },
   text: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
   },
+  closeButton: {
+    paddingLeft: 10,
+  },
 });
-
