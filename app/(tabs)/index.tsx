@@ -8,8 +8,8 @@ export default function Home() {
 
   // Interpolating the header opacity based on scroll position
   const headerTranslateY = scrollY.interpolate({
-    inputRange: [0, 100],  // Start hiding after 100px scroll
-    outputRange: [0, -100], // Move header up by 60px
+    inputRange: [0, 100],
+    outputRange: [0, -100], 
     extrapolate: 'clamp',
   });
 
@@ -19,11 +19,10 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      {/* Animated Header */}
-      <Animated.View style={[styles.headerBar, { transform: [{ translateY: headerTranslateY }] }]}>
+      {/* Animated Header - Lifting Lads Title */}
+      <Animated.View style={[styles.headerWrapper, { transform: [{ translateY: headerTranslateY }] }]}>
         <Text style={styles.title}>Lifting Lads</Text>
 
-        {/* Profile Pic Button (Top-Right Corner) */}
         <TouchableOpacity onPress={goToProfile}>
           <Image
             source={{ uri: 'https://via.placeholder.com/40' }}
@@ -35,7 +34,7 @@ export default function Home() {
       {/* Scrollable Post List */}
       <Animated.ScrollView
         style={styles.scrollContainer}
-        contentContainerStyle={{ paddingTop: 80 }}
+        contentContainerStyle={{ paddingTop: 120 }} // Increased paddingTop to push posts down
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: true }
@@ -49,8 +48,7 @@ export default function Home() {
             onPressOut={() => console.log('Pressed out')}
             style={styles.postContainer}
           >
-            {/* Post Header */}
-            <View style={styles.header}>
+            <View style={styles.postHeader}>
               <View style={styles.profileContainer}>
                 <Image
                   source={{ uri: 'https://via.placeholder.com/50' }}
@@ -61,10 +59,8 @@ export default function Home() {
               <Text style={styles.date}>Feb 22, 2025</Text>
             </View>
 
-            {/* Post Content */}
             <View style={styles.postContent} />
 
-            {/* Description */}
             <Text style={styles.description}>Description goes here...</Text>
           </Pressable>
         ))}
@@ -78,28 +74,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
   },
-  headerBar: {
+  headerWrapper: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
+    top: 40, 
+    left: 16,
+    right: 16,
     zIndex: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    marginTop: 20,
-    marginBottom: 20
+    paddingBottom: 10,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
   },
   profilePic: {
@@ -111,7 +98,6 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     paddingHorizontal: 16,
-    marginBottom: 10,
   },
   postContainer: {
     backgroundColor: '#f3f3f3',
@@ -122,7 +108,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
   },
-  header: {
+  postHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 8,
