@@ -10,10 +10,20 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useAuth } from '@/hooks/useAuth';  // <-- Import the custom hook
 import TopRightIcons from './TopRightIcons';
+import UserProvider from '../Store'
 
 SplashScreen.preventAutoHideAsync();
 
+
 export default function RootLayout() {
+  return (
+    <UserProvider>
+      <RootLayoutContent />
+    </UserProvider>
+  );
+}
+
+function RootLayoutContent() {
   const colorScheme = useColorScheme();
   
   // Use the custom hook

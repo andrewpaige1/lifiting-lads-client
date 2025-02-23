@@ -1,7 +1,8 @@
 // hooks/useAuth.ts
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
+import { UserContext } from '../Store';
 
 // NOTE: If you'd like, you can keep domain and client IDs in .env for security
 const auth0Domain = 'dev-k677hwj8xdv51cs0.us.auth0.com';
@@ -17,8 +18,12 @@ const discovery = {
 const scopes = ['openid', 'profile', 'email'];
 
 export function useAuth() {
-  const [userInfo, setUserInfo] = useState<any>(null);
-
+  //const [userInfo, setUserInfo] = useState<any>(null);
+  const userContext = useContext(UserContext);
+  if (!userContext) {
+    throw new Error("useAuth must be used within a UserProvider");
+  }
+  const { userInfo, setUserInfo } = userContext;
   const redirectUri = AuthSession.makeRedirectUri({
     scheme: 'liftinglads', // Must match the "scheme" in your app.json or app.config.js
   });
