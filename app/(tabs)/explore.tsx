@@ -3,7 +3,7 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } 
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://159.91.226.30:3000';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://172.23.36.208:3000';
 
 const ExploreScreen = () => {
   type User = {
