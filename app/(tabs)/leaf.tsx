@@ -17,6 +17,7 @@ import {
 import * as Location from 'expo-location';
 import axios from 'axios';
 import Constants from 'expo-constants';
+const WORKER_URL = 'https://twilight-mountain-853c.wojcier2.workers.dev';
 
 type LocationCoords = {
   latitude: number;
@@ -137,47 +138,77 @@ const LeafScreen = () => {
       Alert.alert('Error', 'Failed to get user location.');
     }
   };
+// R937iL9pcBW8fplXc5IFfMx72lwl4Vm201DpU-BJ
+  // 🌟 Fetch Sustainability Fun Fact from Cloudflare Worker
 
-  // 🌟 Fetch Sustainability Fun Fact
+  async function run(model: string, input: any) {
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/5f789daa18deaf45669138306e370b1d/ai/run/${model}`,
+      {
+        headers: { Authorization: "Bearer R937iL9pcBW8fplXc5IFfMx72lwl4Vm201DpU-BJ" },
+        method: "POST",
+        body: JSON.stringify(input),
+      }
+    );
+    const result = await response.json();
+    return result;
+  }
+
+
+
+
   const fetchFunFact = async () => {
-    if (!openaiApiKey) {
-      Alert.alert('Error', 'OpenAI API key is missing.');
-      return;
-    }
-
     setFactLoading(true);
-    try {
-      const response = await axios.post(
-        'https://api.openai.com/v1/chat/completions',
+
+
+    run("@cf/meta/llama-3-8b-instruct", {
+      messages: [
         {
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'user',
-              content:
-                'Provide a fun fact about sustainability and carbon footprint awareness with a cited source.',
-            },
-          ],
-          temperature: 0.7,
-          max_tokens: 1,
+          role: "system",
+          content: "You are a sustainability expert on the environment",
         },
         {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${openaiApiKey}`,
-          },
-        }
-      );
-
-      const tip = response.data.choices[0]?.message?.content;
-      setFunFact(tip || 'No fact available at the moment.');
-    } catch (error) {
-      console.error('Failed to fetch fun fact:', error);
-      Alert.alert('Error', 'Failed to fetch sustainability tip.');
-    } finally {
+          role: "user",
+          content:
+            "Share a sustainability tip with a cited source.",
+        },
+      ],
+    }).then((response) => {
+      console.log(JSON.stringify(response));
+      setFunFact(response.result.response);
       setFactLoading(false);
-    }
-  };
+
+
+    });
+
+
+
+
+    /*try {
+        const response = await axios.post(
+            WORKER_URL,
+            { query: 'Share a sustainability tip with a cited source.' },
+            { headers: { 'Content-Type': 'application/json' } }
+        );
+
+        const result = response.data?.response;
+        if (result) {
+            setFunFact(result);
+        } else {
+            setFunFact('No sustainability tip available at the moment.');
+        }
+    } catch (error) {
+        console.error('Failed to fetch sustainability tip:', error);
+        setFunFact('Failed to retrieve sustainability tip.');
+    } finally {
+        setFactLoading(false);
+    }*/
+};
+
+  
+  
+  
+  
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -229,9 +260,15 @@ const LeafScreen = () => {
           {funFact && (
             <View style={styles.funFactBox}>
               <Text style={styles.funFactHeader}>🌍 Sustainability Tip</Text>
-              <Text style={styles.funFactText}>{funFact}</Text>
+              <Text style={styles.funFactText}>{funFact.split('\n').map((line, index) => (
+                <React.Fragment key={index}>
+                  {line}
+                  {'\n'}
+                </React.Fragment>
+              ))}</Text>
             </View>
           )}
+
         </ScrollView>
 
         <View style={styles.bottomButtonWrapper}>
