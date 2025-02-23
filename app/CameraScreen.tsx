@@ -1,58 +1,34 @@
 // app/CameraScreen.tsx
-/*import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Camera, CameraType } from 'expo-camera';
-import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { useNavigation } from 'expo-router';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from './types';  // Import the route types
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'CameraScreen'>;
 
 const CameraScreen = () => {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [type, setType] = useState<'front' | 'back'>('back');
-  const cameraRef = useRef<React.ElementRef<typeof Camera>>(null);
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
 
-  // Request Camera Permission
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
-
-  // Take Picture
-  const takePicture = async () => {
-    if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
-      console.log('Photo taken:', photo.uri);
-      alert('Photo taken successfully!');
-    }
+  const handleTakePicture = () => {
+    Alert.alert('Take Picture', 'This is where users will take a picture.');
   };
-
-  if (hasPermission === null) {
-    return <Text>Requesting camera permission...</Text>;
-  }
-
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
-  }
 
   return (
     <View style={styles.container}>
-      <Camera ref={cameraRef} style={styles.camera} type={type}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.flipButton}
-            onPress={() => setType(type === 'back' ? 'front' : 'back')}
-          >
-            <Text style={styles.text}>Flip Camera</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
-            <Text style={styles.text}>Take Picture</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.text}>Go Back</Text>
-          </TouchableOpacity>
-        </View>
-      </Camera>
+      <Text style={styles.header}>Post Your Lift</Text>
+
+      <View style={styles.placeholder}>
+        <Text style={styles.placeholderText}>Camera view will appear here</Text>
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleTakePicture}>
+        <Text style={styles.buttonText}>Take Picture</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('(tabs)')}>
+        <Text style={styles.buttonText}>Back to Post</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -62,36 +38,47 @@ export default CameraScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
+    backgroundColor: '#f8f8f8',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  camera: {
-    flex: 1,
+  header: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
-  buttonContainer: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'flex-end',
-    paddingBottom: 30,
+  placeholder: {
+    width: '100%',
+    height: 300,
+    backgroundColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginBottom: 20,
   },
-  flipButton: {
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 5,
-  },
-  captureButton: {
-    backgroundColor: '#28a745',
-    padding: 10,
-    borderRadius: 5,
-  },
-  backButton: {
-    backgroundColor: '#dc3545',
-    padding: 10,
-    borderRadius: 5,
-  },
-  text: {
-    color: '#fff',
+  placeholderText: {
+    color: '#666',
     fontSize: 16,
   },
+  button: {
+    padding: 15,
+    backgroundColor: '#28a745',
+    borderRadius: 10,
+    alignItems: 'center',
+    width: '80%',
+    marginBottom: 10,
+  },
+  backButton: {
+    padding: 15,
+    backgroundColor: '#dc3545',
+    borderRadius: 10,
+    alignItems: 'center',
+    width: '80%',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
 });
-*/

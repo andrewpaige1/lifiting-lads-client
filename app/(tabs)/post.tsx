@@ -4,11 +4,10 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-// Define route parameters inline
+// Define route parameters
 type RootStackParamList = {
-  MainPost: undefined;
-  Camera: undefined;
-  PRPost: undefined;
+  PRPostScreen: undefined;
+  CameraScreen: undefined;
   PostReview: { imageUri: string };
   '(tabs)': undefined;
 };
@@ -16,23 +15,27 @@ type RootStackParamList = {
 // Type for navigation prop
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-const Post = () => {
+const PostScreen = () => {
   const navigation = useNavigation<NavigationProp>();
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Create a New Post</Text>
 
-      <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('PRPost')}>
+      {/* Post a PR */}
+      <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('PRPostScreen')}>
         <Text style={styles.boxText}>Post a PR</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('Camera')}>
+      {/* Post Your Lift */}
+      <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('CameraScreen')}>
         <Text style={styles.boxText}>Post Your Lift</Text>
       </TouchableOpacity>
     </View>
   );
 };
+
+export default PostScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -40,19 +43,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f8f8f8',
+    paddingHorizontal: 20,
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 30,
+    textAlign: 'center',
   },
   box: {
-    width: '80%',
+    width: '100%',
     padding: 20,
     marginVertical: 10,
     backgroundColor: '#007bff',
     borderRadius: 10,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
   boxText: {
     color: '#fff',
@@ -60,5 +70,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-
-export default Post;

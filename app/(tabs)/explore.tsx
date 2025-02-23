@@ -1,8 +1,8 @@
-// app/explore.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 
+// Sample data for search
 const data = [
   { id: '1', name: 'Bench Press' },
   { id: '2', name: 'Deadlift' },
@@ -16,6 +16,7 @@ const ExploreScreen = () => {
   const [filteredData, setFilteredData] = useState(data);
   const router = useRouter();
 
+  // Handle search logic
   const handleSearch = (text: string) => {
     setSearchQuery(text);
     const filtered = data.filter(item =>
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
   },
   headerBar: {
-    marginTop: 40, // Ensure space below the status bar
+    marginTop: 40, // Space below status bar
     marginBottom: 10,
     paddingHorizontal: 20,
     flexDirection: 'row',
@@ -114,3 +115,4 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+

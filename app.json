@@ -50,6 +50,7 @@
       "typedRoutes": true
     },
     "extra": {
+      "openaiApiKey": "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",
       "router": {
         "origin": false
       }

@@ -38,20 +38,20 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <TopRightIcons />
-      {!userInfo && (
+
+      {!userInfo ? (
         <View style={styles.container}>
           <Button
             title="Login with Auth0"
             disabled={!request}
             onPress={handleLogin}
           />
-        
-      </View>)}
-
-      {/* If user is logged in, display the actual app stack */}
-      {userInfo && (
+        </View>
+      ) : (
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="PRPostScreen" options={{ title: 'Post a PR' }} /> {/* 👈 Added this */}
+          <Stack.Screen name="CameraScreen" options={{ title: 'Post Your Lift' }} /> {/* 👈 Added this */}
           <Stack.Screen name="+not-found" />
         </Stack>
       )}
