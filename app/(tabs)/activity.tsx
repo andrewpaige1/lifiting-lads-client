@@ -10,8 +10,18 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 
+// Type definition for activity items
+type Activity = {
+  id: number;
+  type: 'REQUEST' | 'ACCEPT' | 'PR';
+  user: string;
+  timestamp: string;
+  timeValue: number;
+  message?: string;
+};
+
 // Sample activity data
-const initialActivities = [
+const initialActivities: Activity[] = [
   { id: 1, type: 'REQUEST', user: 'Sarah', timestamp: '1m ago', timeValue: 1 },
   { id: 2, type: 'REQUEST', user: 'Jake', timestamp: '3m ago', timeValue: 3 },
   { id: 3, type: 'REQUEST', user: 'Emily', timestamp: '6m ago', timeValue: 6 },
@@ -30,7 +40,7 @@ const initialActivities = [
 ];
 
 const ActivityFeed = () => {
-  const [activities, setActivities] = useState(initialActivities);
+  const [activities, setActivities] = useState<Activity[]>(initialActivities);
   const router = useRouter();
 
   // Separate requests from others
@@ -44,10 +54,10 @@ const ActivityFeed = () => {
   const sortedActivities = [...requests, ...others];
 
   // Accept request
-  const handleAccept = (item) => {
+  const handleAccept = (item: Activity) => {
     const newList = activities.filter((act) => act.id !== item.id);
     const newAcceptId = Math.max(...activities.map((a) => a.id)) + 1;
-    const newAcceptItem = {
+    const newAcceptItem: Activity = {
       id: newAcceptId,
       type: 'ACCEPT',
       user: item.user,
@@ -58,18 +68,18 @@ const ActivityFeed = () => {
   };
 
   // Reject request
-  const handleReject = (item) => {
+  const handleReject = (item: Activity) => {
     const newList = activities.filter((act) => act.id !== item.id);
     setActivities(newList);
   };
 
   // Display user name
-  const getDisplayName = (item) => {
+  const getDisplayName = (item: Activity): string => {
     return item.type === 'PR' ? item.user : `${item.user}_user`;
   };
 
   // Generate activity message
-  const getActivityMessage = (item) => {
+  const getActivityMessage = (item: Activity): string => {
     const displayName = getDisplayName(item);
     switch (item.type) {
       case 'REQUEST':
@@ -83,8 +93,8 @@ const ActivityFeed = () => {
     }
   };
 
-  // Render each activity item
-  const renderActivityItem = ({ item }) => {
+  // Render each activity item with proper typing
+  const renderActivityItem = ({ item }: { item: Activity }) => {
     const messageText = getActivityMessage(item);
     const isRequest = item.type === 'REQUEST';
 
@@ -133,6 +143,9 @@ const ActivityFeed = () => {
         </TouchableOpacity>
       </View>
 
+      {/* Decorative Line Under Header */}
+      <View style={styles.headerLine} />
+
       {/* Activity Feed */}
       <FlatList
         data={sortedActivities}
@@ -150,63 +163,102 @@ export default ActivityFeed;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f0f2f5',
   },
+
+  // Header Bar
   headerWrapper: {
-    marginTop: 15, // Positioned below the status bar
-    paddingHorizontal: 16,
+    marginTop: -13, // Reduced space for tighter layout
+    right: 10,
+    marginBottom: 10,
+    paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingBottom: 8,
   },
   header: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 25,
+    fontWeight: '700',
+    fontFamily: 'Poppins-Bold',
+    color: '#37474f', // Modern gray for titles
+    padding: 14,
+
   },
   profilePic: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#ccc',
+    backgroundColor: '#b0bec5',
   },
+
+  // Decorative Line Under Header
+  headerLine: {
+    height: 4,
+    backgroundColor: '#ddd',
+    borderRadius: 2,
+    marginHorizontal: 20,
+    marginBottom: 10,
+  },
+
+  // Activity List
   listContent: {
     paddingBottom: 80,
   },
+
+  // Activity Item
   itemContainer: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 10,
     marginHorizontal: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
+
   row: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
+
   profileImagePlaceholder: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#ccc',
+    backgroundColor: '#ddd',
     marginRight: 12,
   },
+
   textColumn: {
     flex: 1,
   },
+
   messageText: {
     fontSize: 16,
+    color: '#37474f',
+    fontFamily: 'Poppins-Medium',
     marginBottom: 4,
   },
+
   timestamp: {
     fontSize: 14,
-    color: '#666',
+    color: '#90a4ae',
+    fontFamily: 'Poppins-Light',
     marginBottom: 8,
   },
+
+  // Action Buttons (Accept/Reject)
   actionsRow: {
     flexDirection: 'row',
     marginTop: 5,
   },
+
   actionButton: {
     width: 30,
     height: 30,
@@ -215,6 +267,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   actionText: {
     color: '#fff',
     fontSize: 16,

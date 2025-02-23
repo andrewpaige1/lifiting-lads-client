@@ -1,6 +1,16 @@
-// app/(tabs)/leaf.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+  Image,
+} from 'react-native';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import Constants from 'expo-constants';
@@ -96,61 +106,111 @@ const LeafScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>🌿 Sustainability Tracker</Text>
+    <SafeAreaView style={styles.safeArea}>
+      {/* Header with Title and Profile Pic */}
+      <View style={styles.headerWrapper}>
+        <Text style={styles.header}>Climate Coach</Text>
+        <TouchableOpacity>
+          <Image
+            source={{ uri: 'https://via.placeholder.com/40' }}
+            style={styles.profilePic}
+          />
+        </TouchableOpacity>
+      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Enter gym location"
-        value={gymLocation}
-        onChangeText={setGymLocation}
-      />
+      {/* Decorative Line Under Header */}
+      <View style={styles.headerLine} />
 
-      <TouchableOpacity style={styles.button} onPress={calculateCarbonEmission} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? 'Calculating...' : 'Calculate Emission'}</Text>
-      </TouchableOpacity>
+      {/* Main Content */}
+      <ScrollView contentContainerStyle={styles.content}>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter gym location"
+          value={gymLocation}
+          onChangeText={setGymLocation}
+        />
 
-      {carbonEmission && (
-        <View style={styles.resultBox}>
-          <Text style={styles.resultText}>{carbonEmission}</Text>
-        </View>
-      )}
+        <TouchableOpacity style={styles.button} onPress={calculateCarbonEmission} disabled={loading}>
+          <Text style={styles.buttonText}>{loading ? 'Calculating...' : 'Calculate Emission'}</Text>
+        </TouchableOpacity>
 
-      {/* Generate Fun Fact Button */}
-      <TouchableOpacity style={styles.factButton} onPress={fetchSustainabilityTip} disabled={factLoading}>
-        {factLoading ? (
-          <ActivityIndicator size="small" color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Generate Fun Fact</Text>
+        {carbonEmission && (
+          <View style={styles.resultBox}>
+            <Text style={styles.resultText}>{carbonEmission}</Text>
+          </View>
         )}
-      </TouchableOpacity>
 
-      {sustainabilityTip && (
-        <View style={styles.tipBox}>
-          <Text style={styles.tipHeader}>🌍 Sustainability Fact:</Text>
-          <Text style={styles.tipText}>{sustainabilityTip}</Text>
-        </View>
-      )}
-    </ScrollView>
+        {/* Generate Fun Fact Button */}
+        <TouchableOpacity style={styles.factButton} onPress={fetchSustainabilityTip} disabled={factLoading}>
+          {factLoading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Generate Fun Fact</Text>
+          )}
+        </TouchableOpacity>
+
+        {sustainabilityTip && (
+          <View style={styles.tipBox}>
+            <Text style={styles.tipHeader}>🌍 Sustainability Fact:</Text>
+            <Text style={styles.tipText}>{sustainabilityTip}</Text>
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 export default LeafScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#f0f2f5',
+  },
+
+  // Header Bar
+  headerWrapper: {
+    marginTop: -13, // Reduced space for tighter layout
+    right: 10,
+    marginBottom: 10,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingBottom: 8,
   },
   header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#007bff',
-    padding: 30,
+    fontSize: 25,
+    fontWeight: '700',
+    fontFamily: 'Poppins-Bold',
+    color: '#37474f', // Modern gray for titles
+    padding: 14,
+
   },
+  profilePic: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#b0bec5',
+  },
+
+  // Decorative Line Under Header
+  headerLine: {
+    height: 4,
+    backgroundColor: '#ddd',
+    borderRadius: 2,
+    marginHorizontal: 20,
+    marginBottom: 10,
+  },
+
+  // Main Content
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+
   input: {
     height: 50,
     borderColor: '#007bff',
@@ -160,6 +220,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginBottom: 15,
   },
+
   button: {
     padding: 15,
     backgroundColor: '#007bff',
@@ -167,6 +228,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
+
   factButton: {
     padding: 15,
     backgroundColor: '#28a745',
@@ -174,33 +236,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
+
   buttonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
   },
+
   resultBox: {
     padding: 15,
     backgroundColor: '#e6f7ff',
     borderRadius: 10,
     marginBottom: 20,
   },
+
   resultText: {
     fontSize: 16,
     color: '#333',
   },
+
   tipBox: {
     padding: 15,
     backgroundColor: '#d4edda',
     borderRadius: 10,
     marginTop: 10,
   },
+
   tipHeader: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#28a745',
     marginBottom: 5,
   },
+
   tipText: {
     fontSize: 16,
     color: '#333',

@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   // Post Action Box
   box: {
     width: '100%',
-    padding: 18,
+    padding: 100,
     marginVertical: 12,
     backgroundColor: '#ffffff', // White card-style
     borderRadius: 12,
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   boxText: {
     color: '#37474f',
-    fontSize: 20,
+    fontSize: 30,
     fontFamily: 'Poppins-SemiBold',
   },
 });

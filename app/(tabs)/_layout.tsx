@@ -28,7 +28,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: '',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
@@ -37,7 +37,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Search', // Updated title
+          title: '', // Updated title
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />, // More relevant icon
         }}
       />
@@ -45,7 +45,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="post"
         options={{
-          title: 'Post',
+          title: '',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.circle.fill" color={color} />,
         }}
       />
@@ -53,7 +53,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="activity"
         options={{
-          title: 'Activity',
+          title: '',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="bell.fill" color={color} />,
         }}
       />
@@ -61,7 +61,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="leaf"
         options={{
-          title: 'Leaf',
+          title: '',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="leaf.fill" color={color} />,
         }}
       />

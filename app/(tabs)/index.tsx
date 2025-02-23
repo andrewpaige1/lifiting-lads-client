@@ -78,24 +78,24 @@ const styles = StyleSheet.create({
 
   // Header styling
   headerWrapper: {
-    position: 'absolute',
-    top: 40, // Reduced space from top
-    left: 6,
-    right: 16,
-    zIndex: 10,
+    marginTop: 45, // Reduced space for tighter layout
+    right: 10,
+    marginBottom: 10,
+    paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
+    paddingBottom: 8,
   },
   title: {
     fontSize: 25,
     fontWeight: '700',
-    fontFamily: 'Poppins-Bold', 
-    color: '#37474f',
-    padding: 15,
+    fontFamily: 'Poppins-Bold',
+    color: '#37474f', // Modern gray for titles
+    padding: 14,
+
   },
   profilePic: {
     width: 40,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 80, // Reduced padding for tighter layout
+    paddingTop: 0, // Reduced padding for tighter layout
   },
 
   // Post container with card effect
