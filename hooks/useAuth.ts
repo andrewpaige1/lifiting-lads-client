@@ -7,7 +7,7 @@ import { UserContext } from '../Store';
 const auth0Domain = 'dev-k677hwj8xdv51cs0.us.auth0.com';
 const clientId = '3sSPuIJrqlcprrRc5i90gKM2Hj3Lz8Tg';
 
-const API_BASE_URL = 'http://172.23.36.208:3000'; // Replace with your actual API URL
+const API_BASE_URL = 'https://lifting-lads-api.onrender.com'; // Replace with your actual API URL
 
 // Auth0's "discovery" endpoints
 const discovery = {

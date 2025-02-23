@@ -45,7 +45,7 @@ export default function ViewPicture() {
       formData.append('userInfo', JSON.stringify(userInfo));
 
       const response = await axios.post(
-        'http://172.23.36.208:3000/upload', 
+        'https://lifting-lads-api.onrender.com/upload', 
         formData,
         {
           headers: {
