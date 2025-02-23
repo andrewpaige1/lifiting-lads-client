@@ -107,11 +107,11 @@ const UserProfile: React.FC = () => {
           friendType: "closeFriend"
         });
 
-      console.log('Response:', response.data);
+      //console.log('Response:', response.data);
       alert('Submitted successfully!');
     } catch (error) {
-      console.error('Error:', error);
-      alert('Submission failed');
+      //console.error('Error:', error);
+      alert('You already submitted a friend request!');
     }
   }
 
