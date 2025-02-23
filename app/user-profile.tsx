@@ -103,7 +103,28 @@ const UserProfile: React.FC = () => {
         {
           requesterName: userInfo.nickname,
           requestedName: user.nickname,
-          requesterPicture: userInfo.picture
+          requesterPicture: userInfo.picture,
+          friendType: "closeFriend"
+        });
+
+      console.log('Response:', response.data);
+      alert('Submitted successfully!');
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Submission failed');
+    }
+  }
+
+  const addFriend = async () => {
+    try {
+      console.log(user)
+      const response = await axios.post(
+        'https://lifting-lads-api.onrender.com/add-lifting-lad', 
+        {
+          requesterName: userInfo.nickname,
+          requestedName: user.nickname,
+          requesterPicture: userInfo.picture,
+          friendType: "friend"
         });
 
       console.log('Response:', response.data);
@@ -127,7 +148,7 @@ const UserProfile: React.FC = () => {
 {/* Add Friend and Add Lifting Lad Buttons */}
 <View style={styles.buttonContainer}>
   <TouchableOpacity style={styles.button}>
-    <Text style={styles.buttonText}>Add Friend</Text>
+    <Text style={styles.buttonText} onPress={addFriend}>Add Friend</Text>
   </TouchableOpacity>
   <TouchableOpacity style={styles.button} onPress={addLiftingLad}>
     <Text style={styles.buttonText}>Add Lifting Lad</Text>

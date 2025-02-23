@@ -1,15 +1,62 @@
-import React, { useContext, useRef } from 'react';
-import { View, Text, Image, ScrollView, Pressable, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import React, { useContext, useEffect, useState, useRef } from 'react';
+import { 
+  View, Text, Image, ScrollView, Pressable, StyleSheet, 
+  TouchableOpacity, Animated, ActivityIndicator, RefreshControl
+} from 'react-native';
+import { Video } from 'expo-av';
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/hooks/useAuth';
 import { UserContext } from '@/Store';
 
+// Define Post Type
+interface Post {
+  id: string;
+  type: string; // Can be "lift" (image) or "pr" (video)
+  content: string;
+  imageUrl: string; // URL for image or video
+  tags: string[];
+  createdAt: string;
+  author: string;
+}
 
 export default function Home() {
   const router = useRouter();
   const scrollY = useRef(new Animated.Value(0)).current;
   const userContext = useContext(UserContext);
-  const { userInfo } = userContext;
+  const { userInfo } = userContext ?? {}; // Ensure context is not undefined
+
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState<boolean>(false); // State for pull-to-refresh
+
+  // Fetch friends' posts from backend
+  const fetchPosts = async () => {
+    if (!userInfo?.nickname) return;
+
+    try {
+      const response = await fetch(`https://lifting-lads-api.onrender.com/friends-posts/${userInfo.nickname}`);
+      if (!response.ok) throw new Error("Failed to fetch posts");
+
+      const data = await response.json();
+      if (data.posts) {
+        setPosts(data.posts);
+      }
+    } catch (error) {
+      console.error("Error fetching friends' posts:", error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false); // Stop refreshing when done
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, [userInfo?.nickname]);
+
+  // Function to handle pull-to-refresh
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchPosts();
+  };
 
   // Interpolating the header opacity based on scroll position
   const headerTranslateY = scrollY.interpolate({
@@ -30,45 +77,62 @@ export default function Home() {
 
         <TouchableOpacity onPress={goToProfile}>
           <Image
-            source={{ uri: 'https://via.placeholder.com/40' }}
+            source={{ uri: userInfo?.picture || 'https://via.placeholder.com/40' }}
             style={styles.profilePic}
           />
         </TouchableOpacity>
       </Animated.View>
 
-      {/* Scrollable Post List */}
+      {/* Scrollable Post List with Refresh Control */}
       <Animated.ScrollView
         style={styles.scrollContainer}
-        contentContainerStyle={{ paddingTop: 120 }} // Increased paddingTop to push posts down
+        contentContainerStyle={{ paddingTop: 120 }}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: true }
         )}
         scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
-        {[...Array(10)].map((_, index) => (
-          <Pressable
-            key={index}
-            onPressIn={() => console.log('Pressed in')}
-            onPressOut={() => console.log('Pressed out')}
-            style={styles.postContainer}
-          >
-            <View style={styles.postHeader}>
-              <View style={styles.profileContainer}>
-                <Image
-                  source={{ uri: userInfo.picture }}
-                  style={styles.profileImage}
-                />
-                <Text style={styles.username}>Username</Text>
+        {loading ? (
+          <ActivityIndicator size="large" color="#1e88e5" style={{ marginTop: 50 }} />
+        ) : posts.length === 0 ? (
+          <Text style={styles.noPostsText}>No posts from friends yet.</Text>
+        ) : (
+          posts.map((post) => (
+            <Pressable key={post.id} style={styles.postContainer}>
+              <View style={styles.postHeader}>
+                <View style={styles.profileContainer}>
+                  <Image
+                    source={{ uri: post.imageUrl || 'https://via.placeholder.com/100' }}
+                    style={styles.profileImage}
+                  />
+                  <Text style={styles.username}>{post.author || "Unknown"}</Text>
+                </View>
+                <Text style={styles.date}>{new Date(post.createdAt).toLocaleDateString()}</Text>
               </View>
-              <Text style={styles.date}>Feb 22, 2025</Text>
-            </View>
 
-            <View style={styles.postContent} />
+              {/* Post Content: Image or Video */}
+              <View style={styles.postContent}>
+                {post.type === "pr" ? (
+                  <Video
+                    source={{ uri: post.imageUrl }}
+                    style={styles.postVideo}
+                    useNativeControls
+                    shouldPlay
+                    isLooping
+                  />
+                ) : (
+                  <Image source={{ uri: post.imageUrl }} style={styles.postImage} />
+                )}
+              </View>
 
-            <Text style={styles.description}>Description goes here...</Text>
-          </Pressable>
-        ))}
+              <Text style={styles.description}>{post.content || "No description provided."}</Text>
+            </Pressable>
+          ))
+        )}
       </Animated.ScrollView>
     </View>
   );
@@ -77,12 +141,12 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f2f5', // Light modern background
+    backgroundColor: '#f0f2f5',
   },
 
   // Header styling
   headerWrapper: {
-    marginTop: 45, // Reduced space for tighter layout
+    marginTop: 45,
     right: 10,
     marginBottom: 10,
     paddingHorizontal: 20,
@@ -97,9 +161,8 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: '700',
     fontFamily: 'Poppins-Bold',
-    color: '#37474f', // Modern gray for titles
+    color: '#37474f',
     padding: 14,
-
   },
   profilePic: {
     width: 40,
@@ -112,7 +175,15 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 0, // Reduced padding for tighter layout
+  },
+
+  // No posts text
+  noPostsText: {
+    textAlign: 'center',
+    fontSize: 18,
+    color: '#90a4ae',
+    marginTop: 50,
+    fontFamily: 'Poppins-Medium',
   },
 
   // Post container with card effect
@@ -158,11 +229,19 @@ const styles = StyleSheet.create({
 
   // Post content area
   postContent: {
-    height: 300,
-    backgroundColor: '#cfd8dc',
     borderRadius: 12,
     marginBottom: 8,
     overflow: 'hidden',
+  },
+  postImage: {
+    width: '100%',
+    height: 250,
+    borderRadius: 12,
+  },
+  postVideo: {
+    width: '100%',
+    height: 250,
+    borderRadius: 12,
   },
 
   // Post description
@@ -171,59 +250,5 @@ const styles = StyleSheet.create({
     color: '#455a64',
     lineHeight: 22,
     fontFamily: 'Poppins-Regular',
-  },
-
-  // Buttons and interactions
-  button: {
-    backgroundColor: '#1e88e5', // New deep blue accent for contrast
-    padding: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 17,
-    fontWeight: '600',
-    fontFamily: 'Poppins-SemiBold',
-  },
-
-  // Fact Box
-  factBox: {
-    padding: 16,
-    backgroundColor: '#e8f5e9', // Soft green for sustainability
-    borderRadius: 12,
-    marginVertical: 10,
-  },
-  factText: {
-    fontSize: 16,
-    color: '#2e7d32',
-    fontFamily: 'Poppins-Medium',
-  },
-
-  // Card-like input field
-  input: {
-    height: 50,
-    borderColor: '#1e88e5', // Deep blue accent for focus
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    backgroundColor: '#ffffff',
-    marginBottom: 15,
-    fontSize: 16,
-    fontFamily: 'Poppins-Regular',
-  },
-
-  // Card-like results
-  resultBox: {
-    padding: 16,
-    backgroundColor: '#eceff1',
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-  resultText: {
-    fontSize: 16,
-    color: '#37474f',
-    fontFamily: 'Poppins-Medium',
   },
 });

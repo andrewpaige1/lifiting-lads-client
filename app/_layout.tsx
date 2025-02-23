@@ -3,17 +3,16 @@ import { ThemeProvider } from '@react-navigation/native';
 import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import { Button, View, StyleSheet } from 'react-native';
+import { Button, View, Text, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { useAuth } from '@/hooks/useAuth';  // <-- Import the custom hook
+import { useAuth } from '@/hooks/useAuth'; 
 import TopRightIcons from './TopRightIcons';
-import UserProvider from '../Store'
+import UserProvider from '../Store';
 
 SplashScreen.preventAutoHideAsync();
-
 
 export default function RootLayout() {
   return (
@@ -25,8 +24,6 @@ export default function RootLayout() {
 
 function RootLayoutContent() {
   const colorScheme = useColorScheme();
-  
-  // Use the custom hook
   const { userInfo, request, handleLogin } = useAuth();
 
   // Load fonts
@@ -42,7 +39,7 @@ function RootLayoutContent() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) {
-    return null; // or a loading spinner
+    return null;
   }
 
   return (
@@ -51,18 +48,23 @@ function RootLayoutContent() {
 
       {!userInfo ? (
         <View style={styles.container}>
+          <Text style={styles.title}>Welcome to Lifting Lads</Text>
+          <Text style={styles.subtitle}>
+            Track your workouts, stay motivated, and see when your friends are at the gym.
+          </Text>
           <Button
-            title="Login with Auth0"
+            title="Login to Get Started"
             disabled={!request}
             onPress={handleLogin}
+            color="#ff5733" 
           />
         </View>
       ) : (
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="PRPostScreen" options={{ title: 'Post a PR' }} /> {/* 👈 Added this */}
+          <Stack.Screen name="PRPostScreen" options={{ title: 'Post a PR' }} />
           <Stack.Screen name="prePost" options={{ title: 'Preview Post' }} />
-          <Stack.Screen name="CameraScreen" options={{ title: 'Post Your Lift' }} /> {/* 👈 Added this */}
+          <Stack.Screen name="CameraScreen" options={{ title: 'Post Your Lift' }} />
           <Stack.Screen name="+not-found" />
         </Stack>
       )}
@@ -77,8 +79,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
     backgroundColor: '#F5FCFF',
-    // change the size of the buttons
-    
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
   },
 });
+
