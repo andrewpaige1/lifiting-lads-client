@@ -33,7 +33,7 @@ export default function Home() {
     if (!userInfo?.nickname) return;
 
     try {
-      const response = await fetch(`https://lifting-lads-api.onrender.com/friends-posts/${userInfo.nickname}`);
+      const response = await fetch(`http://192.168.1.178:3000/friends-posts/${userInfo.nickname}`);
       if (!response.ok) return;
 
       const data = await response.json();
@@ -41,7 +41,8 @@ export default function Home() {
         setPosts(data.posts);
       }
     } catch (error) {
-      return error
+        console.log(error)
+        //return error
     } finally {
       setLoading(false);
       setRefreshing(false); // Stop refreshing when done
