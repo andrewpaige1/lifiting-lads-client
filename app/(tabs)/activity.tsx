@@ -73,7 +73,7 @@ const ActivityFeed = () => {
   // Handle Accept Request
   const handleAccept = async (id: number, user: string, friendType: string, picture: string) => {
     try {
-      const response = await axios.post("http://192.168.1.178:3000/accept-lifting-lad", {
+      const response = await axios.post("https://lifting-lads-api.onrender.com/accept-lifting-lad", {
         requesterName: user,
         requestedName: userInfo.nickname,
         requesterPicture: picture,
