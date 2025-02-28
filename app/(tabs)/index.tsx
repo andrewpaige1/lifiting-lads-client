@@ -28,14 +28,13 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false); // State for pull-to-refresh
 
-  // Typewriter effect for "Lifting Lads" header
   const [displayedText, setDisplayedText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const text = "Lifting Lads";
-  const typingSpeed = 165;  // Speed of typing/deleting
+  const typingSpeed = 150;  // Speed of typing/deleting
 
   useEffect(() => {
-    let timeout;
+    let timeout: NodeJS.Timeout;
     
     if (!isDeleting && displayedText.length < text.length) {
       timeout = setTimeout(() => {
@@ -50,9 +49,10 @@ export default function Home() {
     } else if (displayedText.length === 0 && isDeleting) {
       timeout = setTimeout(() => setIsDeleting(false), 500);
     }
-
+  
     return () => clearTimeout(timeout);
   }, [displayedText, isDeleting]);
+  
 
   // Fetch friends' posts from backend
   const fetchPosts = async () => {
@@ -67,7 +67,8 @@ export default function Home() {
         setPosts(data.posts);
       }
     } catch (error) {
-      console.log(error);
+        console.log(error)
+        //return error
     } finally {
       setLoading(false);
       setRefreshing(false); // Stop refreshing when done
@@ -97,17 +98,17 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      {/* Animated Header - Lifting Lads Title with Typewriter Effect */}
-      <Animated.View style={[styles.headerWrapper, { transform: [{ translateY: headerTranslateY }] }]}>
-        <Text style={styles.title}>{displayedText}|</Text>
+    {/* Animated Header - Lifting Lads Title with Typewriter Effect */}
+    <Animated.View style={[styles.headerWrapper, { transform: [{ translateY: headerTranslateY }] }]}>
+      <Text style={styles.title}>{displayedText}|</Text>
 
-        <TouchableOpacity onPress={goToProfile}>
-          <Image
-            source={{ uri: userInfo?.picture || 'https://via.placeholder.com/40' }}
-            style={styles.profilePic}
-          />
-        </TouchableOpacity>
-      </Animated.View>
+      <TouchableOpacity onPress={goToProfile}>
+        <Image
+          source={{ uri: userInfo?.picture || 'https://via.placeholder.com/40' }}
+          style={styles.profilePic}
+        />
+      </TouchableOpacity>
+    </Animated.View>
 
       {/* Scrollable Post List with Refresh Control */}
       <Animated.ScrollView
@@ -252,5 +253,29 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Light',
     color: '#90a4ae',
   },
-});
 
+  // Post content area
+  postContent: {
+    borderRadius: 12,
+    marginBottom: 8,
+    overflow: 'hidden',
+  },
+  postImage: {
+    width: '100%',
+    height: 250,
+    borderRadius: 12,
+  },
+  postVideo: {
+    width: '100%',
+    height: 250,
+    borderRadius: 12,
+  },
+
+  // Post description
+  description: {
+    fontSize: 15,
+    color: '#455a64',
+    lineHeight: 22,
+    fontFamily: 'Poppins-Regular',
+  },
+});
